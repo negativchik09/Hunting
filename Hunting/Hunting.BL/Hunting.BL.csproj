@@ -30,4 +30,8 @@
       <Folder Include="obj\Debug\net6.0\ref" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
+
 </Project>
