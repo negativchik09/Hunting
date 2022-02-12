@@ -1,5 +1,7 @@
-﻿using Hunting.BL.Matrix;
+﻿using Hunting.BL.Enum;
+using Hunting.BL.Matrix;
 using Hunting.BL.Special;
+using Hunting.BL.Units;
 using Newtonsoft.Json;
 using Timer = System.Timers.Timer;
 
@@ -9,9 +11,9 @@ public class Gateway
 {
     private Timer _timer;
 
-    public Gateway(Timer timer)
+    public Gateway()
     {
-        _timer = timer;
+        _timer = new Timer();
         _timer.AutoReset = true;
         _timer.Elapsed += (sender, args) => ExecuteOneTurn();
     }
@@ -69,7 +71,29 @@ public class Gateway
 
     public string SaveMap()
     {
-        return JsonConvert.SerializeObject(NodeAggregator.NodeList);
+        return JsonConvert.SerializeObject(NodeAggregator.NodeList, Formatting.Indented);
+    }
+
+    public string GetDefaultMap()
+    {
+        var nodes = new List<Node>();
+        for (int i = 0; i < NodeAggregator.MatrixSize; i++)
+        {
+            for (int j = 0; j < NodeAggregator.MatrixSize; j++)
+            {
+                nodes.Add(new Node()
+                {
+                    Meat = Array.Empty<Meat>(),
+                    Surface = Surface.Grass,
+                    Unit = null,
+                    X = j,
+                    Y = i
+                });
+            }
+        }
+
+        nodes[^1].Unit = new Wolf("wolf1", nodes[^1]);
+        return JsonConvert.SerializeObject(nodes, Formatting.Indented);
     }
 
     public event EventHandler<MapUpdateEventParameters>? MapUpdated;

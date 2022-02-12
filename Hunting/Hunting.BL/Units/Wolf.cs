@@ -1,11 +1,12 @@
 ﻿using Hunting.BL.Abstractions;
 using Hunting.BL.Enum;
+using Hunting.BL.Matrix;
 
 namespace Hunting.BL.Units;
 
 public class Wolf : Unit
 { 
-    internal Wolf()
+    internal Wolf(string name, Node node) : base(100, name, 100, node)
     {
         UnitType = nameof(Wolf);
     }

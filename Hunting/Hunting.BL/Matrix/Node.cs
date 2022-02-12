@@ -9,8 +9,8 @@ public class Node
     public Unit? Unit { get; internal set; }
     public Surface Surface { get; internal set; }
     public Meat[] Meat { get; internal set; }
-    internal int X { get; init; }
-    internal int Y { get; init; }
+    public int X { get; internal set; }
+    public int Y { get; internal set; }
     [JsonIgnore]
     internal int TurnsAfterGrassEating { get; set; }
     internal Node(){}
