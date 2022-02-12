@@ -6,7 +6,7 @@ namespace Hunting.BL.Matrix;
 
 public class Node
 {
-    public IUnit? Unit { get; internal set; }
+    public Unit? Unit { get; internal set; }
     public Surface Surface { get; internal set; }
     public Meat[] Meat { get; internal set; }
     internal int X { get; init; }
