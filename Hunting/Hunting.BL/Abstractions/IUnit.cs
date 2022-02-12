@@ -1,7 +1,14 @@
-﻿namespace Hunting.BL.Abstractions;
+﻿using Hunting.BL.Enum;
+using Hunting.BL.Matrix;
+
+namespace Hunting.BL.Abstractions;
 
 public interface IUnit
 {
-    int Hp { get; }
+    string UnitType { get; init; }
+    double Hp { get; }
     string Name { get; }
+    Node Node { get; set; }
+    double Hunger { get; } 
+    Direction Direction { get; }
 }
