@@ -72,11 +72,6 @@ public class Gateway
         return JsonConvert.SerializeObject(NodeAggregator.NodeList);
     }
 
-    public void UseDefaultMap()
-    {
-        NodeAggregator.NodeList = NodeAggregator.DefaultNodes;
-    }
-
     public event EventHandler<MapUpdateEventParameters>? MapUpdated;
 
     protected void OnMapUpdated(MapUpdateEventParameters e)

@@ -5,7 +5,7 @@ namespace Hunting.BL.Matrix;
 
 internal static class NodeAggregator
 {
-    public readonly static int MatrixSize = 30;
+    public static readonly int MatrixSize = 40;
     private static Node[,] _nodes;
     internal static IEnumerable<Node> NodeList
     {
@@ -33,8 +33,6 @@ internal static class NodeAggregator
         get => new ReadOnlyCollection<Node>(new List<Node>(NodeList));
         internal set => NodeList = value;
     }
-
-    public static ReadOnlyCollection<Node> DefaultNodes { get; }
 
     static NodeAggregator()
     {
