@@ -2,7 +2,8 @@
 
 public enum UserCommandExecutionResult
 {
-    Success,
+    Executed,
+    Valid,
     UnknownCommand,
     InvalidCoords,
     InvalidSurface,

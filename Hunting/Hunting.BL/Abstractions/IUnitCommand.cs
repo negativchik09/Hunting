@@ -2,10 +2,9 @@
 
 namespace Hunting.BL.Abstractions;
 
-public interface IUnitCommand : ICommand
+public interface IUnitCommand<in TParams> : ICommand<TParams, UnitCommandExecutionResult>
 {
     Unit Unit { get; init; }
     int Priority { get; }
     double Duration { get; internal set; }
-    UnitCommandExecutionResult Execute();
 }

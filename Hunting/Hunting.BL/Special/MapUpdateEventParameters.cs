@@ -1,15 +1,12 @@
-﻿using Hunting.BL.Abstractions;
-using Hunting.BL.Matrix;
+﻿using Hunting.BL.Matrix;
 
 namespace Hunting.BL.Special;
 
 public class MapUpdateEventParameters
 {
-    public MapUpdateEventParameters(IEnumerable<ICommand>? commands, IEnumerable<Node> nodes)
+    public MapUpdateEventParameters(IEnumerable<Node> nodes)
     {
-        Commands = commands;
         Nodes = nodes;
     }
     public IEnumerable<Node> Nodes { get; }
-    public IEnumerable<ICommand>? Commands { get; }
 }

@@ -2,14 +2,13 @@
 using Hunting.BL.Matrix;
 using Hunting.BL.Special;
 using Newtonsoft.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 using Timer = System.Timers.Timer;
 
 namespace Hunting.BL;
 
 public class Gateway
 {
-    private Timer _timer;
+    private readonly Timer _timer;
 
     public Gateway()
     {
@@ -56,13 +55,15 @@ public class Gateway
             throw new NullReferenceException();
         }
 
-        if (nodes.Count() != NodeAggregator.MatrixSize * NodeAggregator.MatrixSize)
+        IEnumerable<Node> nodeList = nodes as Node[] ?? nodes.ToArray();
+        
+        if (nodeList.Count() != NodeAggregator.MatrixSize * NodeAggregator.MatrixSize)
         {
             return false;
         }
         
-        NodeAggregator.NodeList = nodes;
-        OnMapUpdated(new MapUpdateEventParameters(null, NodeAggregator.Nodes));
+        NodeAggregator.NodeList = nodeList;
+        OnMapUpdated(new MapUpdateEventParameters(NodeAggregator.Nodes));
         
         return true;
     }
@@ -91,6 +92,11 @@ public class Gateway
         }
         
         return JsonConvert.SerializeObject(nodes, Formatting.Indented);
+    }
+
+    public UserCommandExecutionResult AddCommand(string command)
+    {
+        return UserCommandExecutionResult.Executed; // TODO: implementation
     }
 
     public event EventHandler<MapUpdateEventParameters>? MapUpdated;

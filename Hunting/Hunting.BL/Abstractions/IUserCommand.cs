@@ -2,8 +2,7 @@
 
 namespace Hunting.BL.Abstractions;
 
-public interface IUserCommand : ICommand
+public interface IUserCommand<in TParams> : ICommand<TParams, UserCommandExecutionResult>
 {
-    UserCommandExecutionResult Result { get; internal set; }
     string CommandText { get; }
 }
