@@ -8,7 +8,7 @@ public abstract class Unit
 {
     private double _hunger;
     private double _hp;
-    public static HashSet<string> UnitNames { get; }
+    public static HashSet<Unit> Units { get; } = new();
     public string UnitType { get; init; }
 
     public double Hp
@@ -69,7 +69,7 @@ public abstract class Unit
         Node = node;
         UnitType = unitType;
 
-        UnitNames.Add(name);
+        Units.Add(this);
     }
 
     public virtual UnitCommandExecutionResult Step()
@@ -99,7 +99,7 @@ public abstract class Unit
     public virtual UnitCommandExecutionResult Die()
     {
         Node.Unit = null;
-        return UnitNames.Remove(Name) 
+        return Units.Remove(this) 
             ? UnitCommandExecutionResult.Executed 
             : UnitCommandExecutionResult.UnableExecute;
     }

@@ -39,7 +39,7 @@ public class CreateUnitCommand : IUserCommand<CreateUnitContract>
                 return false;
             }
 
-            if (Unit.UnitNames.Contains(contract.UnitName))
+            if (Unit.Units.Select(x => x.Name).Contains(contract.UnitName))
             {
                 State = UserCommandExecutionResult.AlreadyHaveUnitWithThisName;
                 return false;
@@ -55,7 +55,7 @@ public class CreateUnitCommand : IUserCommand<CreateUnitContract>
             return true;
         };
 
-        _execute = (contract) =>
+        _execute = contract =>
         {
             var node = NodeAggregator.GetNode(contract.X, contract.Y);
             Unit unit = contract.UnitType switch
