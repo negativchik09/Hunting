@@ -10,5 +10,7 @@ public enum UserCommandExecutionResult
     InvalidUnitType,
     InvalidUnitName,
     AlreadyHaveUnitOnNode,
-    AlreadyHaveUnitWithThisName
+    AlreadyHaveUnitWithThisName,
+    NoUnitOnNode,
+    NoUnitWithThisName
 }
