@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Hunting.BL;
+using Hunting.BL.Matrix;
+using Hunting.BL.Units;
 
 namespace Hunting.App
 {
@@ -21,16 +25,45 @@ namespace Hunting.App
     /// </summary>
     public partial class MainWindow : Window
     {
-        private BitmapImage rabbit;
-        private BitmapImage wolf;
-        private BitmapImage hunter;
+        private BitmapImage rabbitImage;
+        private BitmapImage wolfImage;
+        private BitmapImage huntsmanImage;
+        private Gateway gateway;
         public MainWindow()
         {
             InitializeComponent();
+            gateway = new Gateway();
             ReadAssets();
             CreateGameField();
-            UpdateGameField();
-
+            gateway.MapUpdated += UpdateGameField;
+            StreamReader reader = null;
+            string content = "";
+            try
+            {
+                reader = new StreamReader(@"Assets/map.json");
+                content = reader.ReadToEnd();
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (reader != null)
+                {
+                    reader.Dispose();
+                }
+            }
+            if (String.IsNullOrEmpty(content))
+            {
+                MessageBox.Show("Вкрали карту");
+                return;
+            }
+            if (!gateway.LoadMap(content)){
+                MessageBox.Show("Ошибка при загрузке карты");
+                return;
+            }
         }
         private void CreateGameField()
         {
@@ -69,38 +102,63 @@ namespace Hunting.App
 
         private void ReadAssets()
         {
-            rabbit = new BitmapImage();
-            rabbit.BeginInit();
-            rabbit.UriSource = new Uri(@"Assets/rabbit.png", UriKind.Relative);
-            rabbit.EndInit();
-            wolf = new BitmapImage();
-            wolf.BeginInit();
-            wolf.UriSource = new Uri(@"Assets/wolf.png", UriKind.Relative);
-            wolf.EndInit();
-            hunter = new BitmapImage();
-            hunter.BeginInit();
-            hunter.UriSource = new Uri(@"Assets/hunter.png", UriKind.Relative);
-            hunter.EndInit();
+            rabbitImage = new BitmapImage();
+            rabbitImage.BeginInit();
+            rabbitImage.UriSource = new Uri(@"Assets/rabbit.png", UriKind.Relative);
+            rabbitImage.EndInit();
+            wolfImage = new BitmapImage();
+            wolfImage.BeginInit();
+            wolfImage.UriSource = new Uri(@"Assets/wolf.png", UriKind.Relative);
+            wolfImage.EndInit();
+            huntsmanImage = new BitmapImage();
+            huntsmanImage.BeginInit();
+            huntsmanImage.UriSource = new Uri(@"Assets/hunter.png", UriKind.Relative);
+            huntsmanImage.EndInit();
         }
-        private void UpdateGameField()
+        private void UpdateGameField(Object? sender, BL.Special.MapUpdateEventParameters p)
         {
-            int imageIndex;
-            for(int i = 1; i < 1600; i += Random.Shared.Next(3, 10))
+            foreach (Node node in p.Nodes.ToList())
             {
-                if ((GameField.Children[i] as Border).Child != null)
+                switch ((int)node.Surface)
                 {
-                    imageIndex = Random.Shared.Next(0, 3);
-                    switch (imageIndex)
+                    case 0:
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.Green;
+                        break;
+                    case 1:
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.Blue;
+                        break;
+                    case 2:
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.SandyBrown;
+                        break;
+                    case 3:
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.DarkGray;
+                        break;
+                    case 4:
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.DarkGreen;
+                        break;
+                    default:
+                        break;
+                }
+                if (node.Unit != null)
+                {
+                    if (((GameField.Children[node.Y * 40 + node.X] as Border).Child as Image).Source != null)
                     {
-                        case 0:
-                            ((GameField.Children[i] as Border).Child as Image).Source = rabbit;
+                        ((GameField.Children[node.Y * 40 + node.X] as Border).Child as Image).Source = null;
+                    }
+                    switch (node.Unit.UnitType)
+                    {
+                        case nameof(Rabbit):
+                            ((GameField.Children[node.Y * 40 + node.X] as Border).Child as Image).Source = rabbitImage;
                             break;
-                        case 1:
-                            ((GameField.Children[i] as Border).Child as Image).Source = wolf;
+                        case nameof(Wolf):
+                            ((GameField.Children[node.Y * 40 + node.X] as Border).Child as Image).Source = wolfImage;
                             break;
-                        case 2:
-                            ((GameField.Children[i] as Border).Child as Image).Source = hunter;
+                        case nameof(Huntsman):
+                            ((GameField.Children[node.Y * 40 + node.X] as Border).Child as Image).Source = huntsmanImage;
                             break;
+                        default:
+                            MessageBox.Show("Ошибка имени юнита");
+                            return;
                     }
                 }
             }
