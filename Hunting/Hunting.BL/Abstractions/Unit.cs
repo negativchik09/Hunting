@@ -6,16 +6,7 @@ namespace Hunting.BL.Abstractions;
 
 public abstract class Unit
 {
-    protected Unit(double hp, string name, double hunger, Node node, string unitType)
-    {
-        Hp = hp;
-        Name = name;
-        Hunger = hunger;
-        Direction = Direction.Bot;
-        Node = node;
-        UnitType = unitType;
-    }
-
+    public static HashSet<string> UnitNames { get; }
     public string UnitType { get; init; }
     public double Hp { get; internal set; }
     public string Name { get; }
@@ -24,12 +15,24 @@ public abstract class Unit
     public double VisibilityAngle { get; init; }
     public Direction Direction { get; private set; }
     [JsonIgnore]
-    public Node Node { get; private set; }
+    public Node Node { get; internal set; }
     [JsonIgnore]
     public int X => Node.X;
 
     [JsonIgnore]
     public int Y => Node.Y;
+    
+    protected Unit(double hp, string name, double hunger, Node node, string unitType)
+    {
+        Hp = hp;
+        Name = name;
+        Hunger = hunger;
+        Direction = Direction.Bot;
+        Node = node;
+        UnitType = unitType;
+
+        UnitNames.Add(name);
+    }
 
     public virtual UnitCommandExecutionResult Step()
     {

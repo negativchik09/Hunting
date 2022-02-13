@@ -15,4 +15,4 @@ remove_unit unitName
 
 remove_unit xCoord yCoord
 
-change_surface 
+change_surface xCoord yCoord surfaceType

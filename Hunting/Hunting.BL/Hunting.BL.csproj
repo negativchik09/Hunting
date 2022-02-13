@@ -27,8 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Commands\Unit\AtomicCommands" />
-      <Folder Include="Commands\User" />
+      <Folder Include="Commands\Unit" />
       <Folder Include="obj\Debug\net6.0\ref" />
     </ItemGroup>
 

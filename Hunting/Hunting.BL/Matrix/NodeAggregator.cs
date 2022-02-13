@@ -166,4 +166,9 @@ internal static class NodeAggregator
 
         return nodes;
     }
+
+    public static Node GetNode(int x, int y)
+    {
+        return _nodes[x, y];
+    }
 }
