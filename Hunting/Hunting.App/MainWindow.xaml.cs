@@ -28,6 +28,11 @@ namespace Hunting.App
         private BitmapImage rabbitImage;
         private BitmapImage wolfImage;
         private BitmapImage huntsmanImage;
+        private SolidColorBrush grassColor;
+        private SolidColorBrush waterColor;
+        private SolidColorBrush dirtColor;
+        private SolidColorBrush stoneColor;
+        private SolidColorBrush treeColor;
         private Gateway gateway;
         public MainWindow()
         {
@@ -99,7 +104,6 @@ namespace Hunting.App
                 }
             }
         }
-
         private void ReadAssets()
         {
             rabbitImage = new BitmapImage();
@@ -114,6 +118,11 @@ namespace Hunting.App
             huntsmanImage.BeginInit();
             huntsmanImage.UriSource = new Uri(@"Assets/hunter.png", UriKind.Relative);
             huntsmanImage.EndInit();
+            grassColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#078b07");
+            waterColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#064295");
+            dirtColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#72493a");
+            stoneColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#7d7676");
+            treeColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#004301");
         }
         private void UpdateGameField(Object? sender, BL.Special.MapUpdateEventParameters p)
         {
@@ -122,19 +131,19 @@ namespace Hunting.App
                 switch ((int)node.Surface)
                 {
                     case 0:
-                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.YellowGreen;
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = grassColor;
                         break;
                     case 1:
-                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.CornflowerBlue;
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = waterColor;
                         break;
                     case 2:
-                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.SaddleBrown;
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = dirtColor;
                         break;
                     case 3:
-                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.DarkGray;
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = stoneColor;
                         break;
                     case 4:
-                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.DarkGreen;
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = treeColor;
                         break;
                     default:
                         break;
@@ -162,6 +171,66 @@ namespace Hunting.App
                     }
                 }
             }
+        }
+        private void LoadButton_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.Filter = "JSON files (*.json) | *.json";
+            Nullable<bool> result = dlg.ShowDialog();
+            if (result == false)
+            {
+                System.Windows.MessageBox.Show("Произошла ошибка при открытии диалогового окна открытия файла.");
+                return;
+            }
+            string path = dlg.FileName;
+            try
+            {
+                using (StreamReader reader = new StreamReader(path))
+                {
+                    string content = reader.ReadToEnd();
+                    gateway.LoadMap(content);
+                }
+            }
+            catch (ArgumentException)
+            {
+                System.Windows.MessageBox.Show("Произошла ошибка." +
+                    "Проверьте правильность пути к файлу.");
+                return;
+            }
+        }
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.Filter = "JSON files (*.json) | *.json";
+            dlg.DefaultExt = "txt";
+            dlg.AddExtension = true;
+            Nullable<bool> result = dlg.ShowDialog();
+            if (result == false)
+            {
+                System.Windows.MessageBox.Show("Произошла ошибка при открытии диалогового окна сохраниения файла.");
+                return;
+            }
+            string path = dlg.FileName;
+            using (StreamWriter writer = new StreamWriter(path, false))
+            {
+                writer.Write(gateway.SaveMap());
+            }
+        }
+        private void StartContinuouslyButton_Click(object sender, RoutedEventArgs e)
+        {
+            gateway.StartContinuousExecution(Int32.Parse(TurnTimeComboBox.Text[0].ToString()));
+        }
+        private void StopButton_Click(object sender, RoutedEventArgs e)
+        {
+            gateway.StopContinuousExecution();
+        }
+        private void PassOneTurnButton_Click(object sender, RoutedEventArgs e)
+        {
+            gateway.ExecuteOneTurn();
+        }
+        private void SendCommandsButton_Click(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 }
