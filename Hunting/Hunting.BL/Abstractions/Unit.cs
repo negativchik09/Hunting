@@ -6,11 +6,49 @@ namespace Hunting.BL.Abstractions;
 
 public abstract class Unit
 {
+    private double _hunger;
+    private double _hp;
     public static HashSet<string> UnitNames { get; }
     public string UnitType { get; init; }
-    public double Hp { get; internal set; }
+
+    public double Hp
+    {
+        get
+        {
+            return _hp;
+        }
+        set
+        {
+            if (value <= 0)
+            {
+                Die();
+            }
+
+            _hp = value;
+        }
+    }
+
     public string Name { get; }
-    public double Hunger { get; internal set; }
+
+    public double Hunger
+    {
+        get
+        {
+            return _hunger;
+        }
+        set
+        {
+            if (value < 0)
+            {
+                Hp += value;
+                _hunger = 0;
+                return;
+            }
+
+            _hunger = value;
+        }
+    }
+
     public int VisibilityRange { get; init; }
     public double VisibilityAngle { get; init; }
     public Direction Direction { get; private set; }
@@ -57,5 +95,14 @@ public abstract class Unit
         Direction = Direction.RightSide();
         return UnitCommandExecutionResult.Executed;
     }
+
+    public virtual UnitCommandExecutionResult Die()
+    {
+        Node.Unit = null;
+        return UnitNames.Remove(Name) 
+            ? UnitCommandExecutionResult.Executed 
+            : UnitCommandExecutionResult.UnableExecute;
+    }
+    
     public abstract UnitCommandExecutionResult Eat();
 }
