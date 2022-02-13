@@ -122,13 +122,13 @@ namespace Hunting.App
                 switch ((int)node.Surface)
                 {
                     case 0:
-                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.Green;
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.YellowGreen;
                         break;
                     case 1:
-                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.Blue;
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.CornflowerBlue;
                         break;
                     case 2:
-                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.SandyBrown;
+                        (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.SaddleBrown;
                         break;
                     case 3:
                         (GameField.Children[node.Y * 40 + node.X] as Border).Background = Brushes.DarkGray;

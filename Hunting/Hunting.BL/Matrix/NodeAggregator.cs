@@ -39,7 +39,7 @@ internal static class NodeAggregator
         _nodes = new Node[MatrixSize, MatrixSize];
     }
 
-    public static IEnumerable<Node> GetNeighbouringNodes(Node node, NeighbourType type)
+    public static IEnumerable<Node> NeighbouringNodes(Node node, NeighbourType type)
     {
         bool isNotOnLeftBorder = node.X - 1 >= 0;
         bool isNotOnRightBorder = node.X + 1 < MatrixSize;
@@ -91,5 +91,79 @@ internal static class NodeAggregator
         if (rangeByX >= 2 || rangeByY >= 2) return false;
         
         return type == NeighbourType.Diagonal || rangeByX + rangeByY < 2;
+    }
+
+    public static Node? NeighbourNode(Node node, Direction direction)
+    {
+        return direction switch
+        {
+            Direction.Left => node.X - 1 >= 0 ? _nodes[node.X - 1, node.Y] : null,
+            Direction.Top => node.Y - 1 >= 0 ? _nodes[node.X, node.Y - 1] : null,
+            Direction.Right => node.X + 1 < MatrixSize ? _nodes[node.X + 1, node.Y] : null,
+            Direction.Bot => node.Y + 1 < MatrixSize ? _nodes[node.X, node.Y + 1] : null,
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+        };
+    }
+
+    public static IEnumerable<Node> VectorFromNode(Node? node, Direction direction)
+    {
+        var getNext = new Func<Node?, Node?>((prevNode) => NeighbourNode(prevNode, direction));
+        
+        var current = node;
+        for (int i = 0;; i++)
+        {
+            current = getNext(current);
+            if (current == null)
+            {
+                yield break;
+            }
+            yield return current;
+        }
+    }
+
+    public static IEnumerable<Node> Segment(Node? node, Direction direction, int range, double segmentRadians)
+    {
+        List<Node> nodes = VectorFromNode(node, direction).Take(range).ToList();
+
+        double phi = segmentRadians / 2;
+
+        int height = (int)Math.Round(range * Math.Sin(phi));
+        int vectorSize;
+        double tanPhi = Math.Tan(phi);
+        int diff = range - nodes.Count;
+        int pivot = diff - 1;
+        Node? leftSide = nodes.Last();
+        Node? rightSide = nodes.Last();
+
+        for (int i = 0; height > 0; height--, i++)
+        {
+            vectorSize = (int)Math.Ceiling(height / tanPhi);
+            if (vectorSize + 2 * pivot == range)
+            {
+                pivot++;
+            }
+            
+            vectorSize = vectorSize - diff + 1;
+            
+            if (leftSide != null)
+            {
+                leftSide = NeighbourNode(leftSide, direction.LeftSide());
+                nodes.AddRange(
+                    VectorFromNode(leftSide, direction.ReverseSide())
+                    .Skip(pivot)
+                    .Take(vectorSize));
+            }
+            
+            if (rightSide != null)
+            {
+                rightSide = NeighbourNode(rightSide, direction.RightSide());
+                nodes.AddRange(
+                    VectorFromNode(rightSide, direction.ReverseSide())
+                        .Skip(pivot)
+                        .Take(vectorSize));
+            }
+        }
+
+        return nodes;
     }
 }

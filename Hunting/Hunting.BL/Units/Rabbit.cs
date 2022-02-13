@@ -6,10 +6,8 @@ namespace Hunting.BL.Units;
 
 public class Rabbit : Unit
 {
-    internal Rabbit(string name, Node node) : base(100, name, 100, node)
-    {
-        UnitType = nameof(Rabbit);
-    }
+    internal Rabbit(string name, Node? node) : base(100, name, 100, node, nameof(Rabbit))
+    { }
 
     public override UnitCommandExecutionResult Step()
     {

@@ -6,10 +6,8 @@ namespace Hunting.BL.Units;
 
 public class Wolf : Unit
 { 
-    internal Wolf(string name, Node node) : base(100, name, 100, node)
-    {
-        UnitType = nameof(Wolf);
-    }
+    internal Wolf(string name, Node? node) : base(100, name, 100, node, nameof(Wolf))
+    { }
 
     public override UnitCommandExecutionResult Step()
     {
