@@ -11,8 +11,7 @@ public class MoveUnitCommand : IUnitCommand<MoveUnitContract>
 {
     private Func<MoveUnitContract, bool> _canExecute;
     private Action<MoveUnitContract> _execute;
-    public Unit Unit { get; init; }
-    public Node EndNode { get; init; }
+
     private MovingPathFindResult MovingPathfindRes;
     public MoveUnitCommand(string commandText)
     {

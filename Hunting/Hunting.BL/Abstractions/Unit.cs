@@ -104,4 +104,6 @@ public abstract class Unit
     }
     
     public abstract UnitCommandExecutionResult Eat();
+
+    public abstract bool CanEat();
 }
