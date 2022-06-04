@@ -18,12 +18,14 @@ public class MoveUnitCommand : IUnitCommand<MoveUnitContract>
         CommandText = commandText;
         _canExecute = contract =>
         {
+            Unit = contract.unit;
             MovingPathfindRes = Pathfinder.FindPath(contract.unit, contract.endNode);
             return MovingPathfindRes.CanMove;
         };
         _execute = contract =>
         {
             if (!_canExecute(contract)) return;
+            Unit = contract.unit;
             int numberOfSteps = contract.unit.UnitType switch
             {
                 nameof(Wolf) => 3,
@@ -56,4 +58,6 @@ public class MoveUnitCommand : IUnitCommand<MoveUnitContract>
 
     public string CommandText { get; }
     public MoveUnitContract Contract { get; set; }
+    
+    public Unit Unit { get; private set; }
 }

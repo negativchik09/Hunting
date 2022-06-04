@@ -17,6 +17,7 @@ internal class UnitAttackCommand : IUnitCommand<UnitAttackContract>
 
         _canExecute = contract =>
         {
+            Unit = contract.attackingUnit;
             switch (contract.attackingUnit.UnitType)
             {
                 case nameof(Wolf):
@@ -28,9 +29,11 @@ internal class UnitAttackCommand : IUnitCommand<UnitAttackContract>
                     $"{contract.attackingUnit.UnitType} is not valid unit type", contract.attackingUnit.UnitType, null);
             }
         };
+        
         _execute = contract =>
         {
             if (!_canExecute(contract)) return;
+            Unit = contract.attackingUnit;
             switch (contract.attackingUnit.UnitType)
             {
                 case nameof(Wolf):
@@ -57,4 +60,5 @@ internal class UnitAttackCommand : IUnitCommand<UnitAttackContract>
     public string CommandText { get; }
 
     public UnitAttackContract Contract { get; set; }
+    public Unit Unit { get; private set; }
 }

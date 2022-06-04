@@ -31,8 +31,10 @@ public class Wolf : Unit
             .Any(x => x.Meat.Any());
     }
 
-    public override ICommand? GetNextCommand()
+    public override ICommand GetNextCommand()
     {
+        UnitIsHasCommandDict[this] = false;
+        
         var prey = Pathfinder.Fow(this)
            .FirstOrDefault(x => x.Unit != null && x.Unit.UnitType == nameof(Rabbit))?.Unit;
 

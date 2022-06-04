@@ -22,8 +22,10 @@ public class Rabbit : Unit
         return Node.Surface == Surface.Grass;
     }
 
-    public override ICommand? GetNextCommand()
+    public override ICommand GetNextCommand()
     {
+        UnitIsHasCommandDict[this] = false;
+        
         var enemy = Pathfinder.Fow(this)
             .FirstOrDefault(x => x.Unit != null && x.Unit.UnitType != nameof(Rabbit))?.Unit;
         

@@ -93,5 +93,5 @@ public abstract class Unit
 
     public abstract bool CanEat();
 
-    public abstract ICommand? GetNextCommand();
+    public abstract ICommand GetNextCommand();
 }

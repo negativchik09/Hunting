@@ -31,8 +31,10 @@ public class Huntsman : Unit
             .Any(x => x.Meat.Any());
     }
 
-    public override ICommand? GetNextCommand()
+    public override ICommand GetNextCommand()
     {
+        UnitIsHasCommandDict[this] = false;
+        
         if (Hunger < 20)
         {
             if (CanEat())

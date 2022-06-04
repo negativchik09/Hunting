@@ -65,9 +65,11 @@ public class CommandExecutor
                             break;
                         case UnitCommandExecutionResult.Executed:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
+                            Unit.UnitIsHasCommandDict[unitCommand.Unit] = false;
                             break;
                         case UnitCommandExecutionResult.UnableExecute:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, false);
+                            Unit.UnitIsHasCommandDict[unitCommand.Unit] = false;
                             break;
                     }
 
@@ -77,6 +79,10 @@ public class CommandExecutor
 
             NodeAggregator.NodeList.SelectMany(x => x.Meat, (node, meat) => meat.TurnsBeforeDispose -= 1);
             NodeAggregator.NodeList.Select(x => x.Meat.RemoveAll(meat => meat.TurnsBeforeDispose == 0));
+
+            continueList.AddRange(
+                Unit.UnitIsHasCommandDict.Keys.Where(unit => !Unit.UnitIsHasCommandDict[unit])
+                    .Select(unit => unit.GetNextCommand()));
 
             TurnNumber += 1;
             yield return pair;
