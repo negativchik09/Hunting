@@ -65,16 +65,15 @@ public static class CommandParser
     
     private static ParsingResult ChangeSurfaceCommandParse(string[] parameters, string fullText)
     {
-        var command = new CreateUnitCommand(fullText);
-        if (parameters.Length != 4)
+        var command = new ChangeSurfaceCommand(fullText);
+        if (parameters.Length != 3)
         {
             return new ParsingResult(false, command, null);
         }
-        var contract = new CreateUnitContract(
+        var contract = new ChangeSurfaceContract(
             Convert.ToInt32(parameters[0]),
             Convert.ToInt32(parameters[1]),
-            parameters[2],
-            parameters[3]
+            parameters[2]
         );
 
         command.Contract = contract;

@@ -126,6 +126,22 @@ namespace Hunting.App
         }
         private void UpdateGameField(Object? sender, BL.Special.MapUpdateEventParameters p)
         {
+            LogTextBox.Text += $"\n% Turn №{p.TurnNumber} %\n\n";
+            if (p.Commands != null)
+            {
+                foreach (var command in p.Commands)
+                {
+                    if (command.Value == true)
+                    {
+                        LogTextBox.Text += $"{command.Key}\n";
+                    }
+                    else
+                    {
+                        LogTextBox.Text += $"FAILED TO EXECUTE {command.Key}\n";
+                    }
+                }
+            }
+
             foreach (Node node in p.Nodes.ToList())
             {
                 switch ((int)node.Surface)
@@ -230,7 +246,8 @@ namespace Hunting.App
         }
         private void SendCommandsButton_Click(object sender, RoutedEventArgs e)
         {
-            
+            gateway.AddCommandRange(CommandTextBox.Text);
+            CommandTextBox.Text = "";
         }
     }
 }
