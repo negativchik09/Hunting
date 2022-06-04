@@ -4,7 +4,7 @@ using Hunting.BL.Enum;
 
 namespace Hunting.BL.Special;
 
-public static class CommandParser // TODO: Add ParsingResultEnum. Validate parameters types
+public static class CommandParser
 {
     private const string CreateUnitCommandText = "create_unit";
     private const string RemoveUnitCommandText = "remove_unit";
