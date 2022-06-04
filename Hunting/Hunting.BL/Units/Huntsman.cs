@@ -11,11 +11,32 @@ public class Huntsman : Unit
 
     public override void Eat()
     {
-        throw new NotImplementedException();
+        var nodes = NodeAggregator.NeighbouringNodes(Node, NeighbourType.Diagonal)
+            .Where(x => x.Meat.Count > 0);
+        foreach (var node in nodes)
+        {
+            Hunger += node.Meat.First().HungerRegen;
+            if (Hunger == 100)
+            {
+                return;
+            }
+        }
     }
 
     public override bool CanEat()
     {
-        throw new NotImplementedException();
+        return NodeAggregator.NeighbouringNodes(Node, NeighbourType.Diagonal)
+            .Any(x => x.Meat.Any());
+    }
+    
+    public override void Die()
+    {
+        Node.Meat.Add(new Meat()
+        {
+            Amount = 4,
+            HungerRegen = 20,
+            TurnsBeforeDispose = 3
+        });
+        base.Die();
     }
 }

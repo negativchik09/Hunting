@@ -6,7 +6,7 @@ namespace Hunting.BL.Abstractions;
 
 public abstract class Unit
 {
-    private double _hunger;
+    private int _hunger;
     private double _hp;
     public static HashSet<Unit> Units { get; } = new();
     public string UnitType { get; init; }
@@ -27,7 +27,7 @@ public abstract class Unit
 
     public string Name { get; }
 
-    public double Hunger
+    public int Hunger
     {
         get { return _hunger; }
         set
@@ -51,7 +51,7 @@ public abstract class Unit
 
     [JsonIgnore] public int Y => Node.Y;
 
-    protected Unit(double hp, string name, double hunger, Node node, string unitType)
+    protected Unit(double hp, string name, int hunger, Node node, string unitType)
     {
         Hp = hp;
         Name = name;

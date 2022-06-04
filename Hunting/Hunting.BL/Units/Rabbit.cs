@@ -22,7 +22,12 @@ public class Rabbit : Unit
 
     public override void Die()
     {
-        Node.Meat
+        Node.Meat.Add(new Meat()
+        {
+            Amount = 1,
+            HungerRegen = 15,
+            TurnsBeforeDispose = 5
+        });
         base.Die();
     }
 }
