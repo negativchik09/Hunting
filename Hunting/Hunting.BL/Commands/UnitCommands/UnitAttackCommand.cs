@@ -30,6 +30,7 @@ internal class UnitAttackCommand : IUnitCommand<UnitAttackContract>
         };
         _execute = contract =>
         {
+            if (!_canExecute(contract)) return;
             switch (contract.attackingUnit.UnitType)
             {
                 case nameof(Wolf):

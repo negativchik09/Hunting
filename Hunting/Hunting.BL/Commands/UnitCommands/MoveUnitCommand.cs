@@ -23,6 +23,7 @@ public class MoveUnitCommand : IUnitCommand<MoveUnitContract>
         };
         _execute = contract =>
         {
+            if (!_canExecute(contract)) return;
             int numberOfSteps = contract.unit.UnitType switch
             {
                 nameof(Wolf) => 3,

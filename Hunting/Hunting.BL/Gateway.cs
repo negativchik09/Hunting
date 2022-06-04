@@ -21,7 +21,12 @@ public class Gateway
 
     public void ExecuteOneTurn()
     {
-        throw new NotImplementedException();
+        OnMapUpdated(
+            new MapUpdateEventParameters(
+                NodeAggregator.Nodes, 
+                new Dictionary<string, bool>(
+                    CommandExecutor.Instance.MakeOneTurn()),
+                CommandExecutor.Instance.TurnNumber));
     }
 
     public void StartContinuousExecution(int seconds)
@@ -98,7 +103,6 @@ public class Gateway
     {
         var parsingResult = CommandParser.Parse(command);
         CommandExecutor.Instance.AddCommand(parsingResult.Command);
-        return;
     }
 
     public void AddCommandRange(string commands)
@@ -108,7 +112,6 @@ public class Gateway
         {
             AddCommand(command);
         }
-        return;
     }
 
     public event EventHandler<MapUpdateEventParameters>? MapUpdated;

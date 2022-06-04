@@ -1,6 +1,8 @@
 ﻿using Hunting.BL.Abstractions;
 using Hunting.BL.Commands.User;
 using Hunting.BL.Commands.UnitCommands;
+using Hunting.BL.Enum;
+using Hunting.BL.Matrix;
 
 namespace Hunting.BL.Special;
 
@@ -10,7 +12,6 @@ public class CommandExecutor
     public static CommandExecutor Instance
     {
         get => _commandExecutor;
-        private set => _commandExecutor = value;
     }
 
     static CommandExecutor()
@@ -20,10 +21,72 @@ public class CommandExecutor
 
     private CommandExecutor()
     {
+        TurnNumber = 0;
         _queue = new PriorityQueue<ICommand, int>();
     }
 
+    public int TurnNumber { get; private set; }
+
     private PriorityQueue<ICommand, int> _queue;
+
+    public IEnumerable<KeyValuePair<string, bool>> MakeOneTurn()
+    {
+        var continueList = new List<ICommand>();
+        while (_queue.Count > 0)
+        {
+            var command = _queue.Dequeue();
+
+            KeyValuePair<string, bool> pair = default;
+
+            switch (command)
+            {
+                case IUserCommand<IContract> userCommand:
+                {
+                    if (userCommand.CanExecute(userCommand.Contract))
+                    {
+                        userCommand?.Execute(userCommand.Contract);
+                    }
+
+                    pair = new KeyValuePair<string, bool>(userCommand.CommandText,
+                        userCommand.State == UserCommandExecutionResult.Executed);
+                    break;
+                }
+                case IUnitCommand<IContract> unitCommand:
+                {
+                    if (unitCommand.CanExecute(unitCommand.Contract))
+                    {
+                        unitCommand?.Execute(unitCommand.Contract);
+                    }
+
+                    switch (unitCommand?.State)
+                    {
+                        case UnitCommandExecutionResult.Executing:
+                            continueList.Add(unitCommand);
+                            break;
+                        case UnitCommandExecutionResult.Executed:
+                            pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
+                            break;
+                        case UnitCommandExecutionResult.UnableExecute:
+                            pair = new KeyValuePair<string, bool>(unitCommand.CommandText, false);
+                            break;
+                    }
+
+                    break;
+                }
+            }
+
+            NodeAggregator.NodeList.SelectMany(x => x.Meat, (node, meat) => meat.TurnsBeforeDispose -= 1);
+            NodeAggregator.NodeList.Select(x => x.Meat.RemoveAll(meat => meat.TurnsBeforeDispose == 0));
+
+            TurnNumber += 1;
+            yield return pair;
+        }
+
+        foreach (var continueCommand in continueList)
+        {
+            AddCommand(continueCommand);
+        }
+    }
 
     public void AddCommand(ICommand command)
     {

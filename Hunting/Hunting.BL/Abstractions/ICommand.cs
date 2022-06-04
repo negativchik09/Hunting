@@ -5,9 +5,9 @@ public interface ICommand
     string CommandText { get; }
 }
 
-public interface ICommand<TParams, TResult> : ICommand 
-    where TResult : System.Enum 
+public interface ICommand<TParams, TResult> : ICommand
     where TParams : IContract
+    where TResult : System.Enum
 {
     Func<TParams, bool> CanExecute { get; }
     Action<TParams> Execute { get; }

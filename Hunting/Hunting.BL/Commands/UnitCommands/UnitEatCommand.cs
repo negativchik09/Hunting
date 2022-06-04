@@ -15,12 +15,10 @@ internal class UnitEatCommand : IUnitCommand<UnitEatContract>
     {
         CommandText = commandText;
 
-        _canExecute = contract =>
-        {
-            return contract.unit.CanEat();
-        };
+        _canExecute = contract => contract.unit.CanEat();
         _execute = contract =>
         {
+            if (!_canExecute(contract)) return;
             contract.unit.Eat();
         };
     }
