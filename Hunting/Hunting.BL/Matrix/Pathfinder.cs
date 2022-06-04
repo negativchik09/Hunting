@@ -58,6 +58,19 @@ internal static class Pathfinder
         }
     }
 
+    public static Direction OppositeDirectionByNodes(Node first, Node second)
+    {
+        var xRange = second.X - first.X;
+        var yRange = second.Y - first.Y;
+        
+        if (Math.Abs(xRange) >= Math.Abs(yRange))
+        {
+            return yRange > 0 ? Direction.Top : Direction.Bot;
+        }
+
+        return xRange > 0 ? Direction.Left : Direction.Right;
+    }
+
     private static Direction? DirectionByRanges(int xRange, int yRange)
     {
         if (Math.Abs(xRange) > Math.Abs(yRange))
@@ -106,9 +119,7 @@ internal static class Pathfinder
     private static Stack<Node>? FindWay(Node start, Node end)
     {
         var distanceDict = NodeAggregator.Nodes
-            .Where(x => x.Surface != Surface.Tree 
-                        && x.Surface != Surface.Water
-                        && x.Unit != null)
+            .Where(NodeAggregator.CanStepOnNode)
             .ToDictionary(x => x, x => -1);
         SetDistances(start, distanceDict);
         var way = new Stack<Node>();
@@ -121,9 +132,7 @@ internal static class Pathfinder
         {
             way.Push(current);
             current = NodeAggregator.NeighbouringNodes(current, NeighbourType.Side)
-                .Where(x => x.Surface != Surface.Tree 
-                            && x.Surface != Surface.Water
-                            && x.Unit != null)
+                .Where(NodeAggregator.CanStepOnNode)
                 .First(x => distanceDict[x] == distanceDict[current] - 1);
         }
 
@@ -146,9 +155,7 @@ internal static class Pathfinder
 
             IEnumerable<Node> nodes = list
                 .Select(node => NodeAggregator.NeighbouringNodes(start, NeighbourType.Side)
-                    .Where(x => x.Surface != Surface.Tree 
-                                && x.Surface != Surface.Water
-                                && x.Unit != null)
+                    .Where(NodeAggregator.CanStepOnNode)
                     .Except(visited))
                 .Aggregate((x, y) => x.Concat(y));
 

@@ -171,4 +171,11 @@ internal static class NodeAggregator
     {
         return _nodes[x, y];
     }
+
+    public static bool CanStepOnNode(Node x)
+    {
+        return x.Surface != Surface.Tree
+               && x.Surface != Surface.Water
+               && x.Unit != null;
+    }
 }

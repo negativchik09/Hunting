@@ -41,7 +41,7 @@ public class RemoveUnitCommand : IUserCommand<RemoveUnitContract>
 
             var unit = Unit.Units.First(func);
             
-            Unit.Units.Remove(unit);
+            Unit.UnitIsHasCommandDict.Remove(unit);
             
             unit.Node.Unit = null;
         };

@@ -6,7 +6,7 @@ namespace Hunting.BL.Units;
 
 public class Huntsman : Unit
 {
-    internal Huntsman(string name, Node? node) : base(100, name, 100, node, nameof(Huntsman))
+    internal Huntsman(string name, Node? node) : base(100, name, 100, node, nameof(Huntsman), 360, 5)
     { }
 
     public override void Eat()
@@ -28,7 +28,12 @@ public class Huntsman : Unit
         return NodeAggregator.NeighbouringNodes(Node, NeighbourType.Diagonal)
             .Any(x => x.Meat.Any());
     }
-    
+
+    public override IUnitCommand<IContract>? GetNextCommand()
+    {
+        throw new NotImplementedException();
+    }
+
     public override void Die()
     {
         Node.Meat.Add(new Meat()

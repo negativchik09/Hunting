@@ -6,7 +6,7 @@ namespace Hunting.BL.Units;
 
 public class Wolf : Unit
 { 
-    internal Wolf(string name, Node? node) : base(50, name, 40, node, nameof(Wolf))
+    internal Wolf(string name, Node? node) : base(50, name, 40, node, nameof(Wolf), 360, 7)
     { }
 
     public override void Eat()
@@ -28,7 +28,12 @@ public class Wolf : Unit
         return NodeAggregator.NeighbouringNodes(Node, NeighbourType.Diagonal)
             .Any(x => x.Meat.Any());
     }
-    
+
+    public override IUnitCommand<IContract>? GetNextCommand()
+    {
+        throw new NotImplementedException();
+    }
+
     public override void Die()
     {
         Node.Meat.Add(new Meat()

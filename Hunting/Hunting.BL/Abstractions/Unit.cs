@@ -1,5 +1,6 @@
 ﻿using Hunting.BL.Enum;
 using Hunting.BL.Matrix;
+using Hunting.BL.Units;
 using Newtonsoft.Json;
 
 namespace Hunting.BL.Abstractions;
@@ -8,8 +9,17 @@ public abstract class Unit
 {
     private int _hunger;
     private double _hp;
-    public static HashSet<Unit> Units { get; } = new();
+    public static IEnumerable<Unit> Units => UnitIsHasCommandDict.Keys;
+    public static Dictionary<Unit, bool> UnitIsHasCommandDict { get; } = new();
     public string UnitType { get; init; }
+
+    public int NodesPerTurn => UnitType switch
+    {
+        nameof(Wolf) => 3,
+        nameof(Rabbit) => 2,
+        nameof(Huntsman) => 2,
+        _ => throw new ArgumentOutOfRangeException()
+    };
 
     public double Hp
     {
@@ -51,7 +61,7 @@ public abstract class Unit
 
     [JsonIgnore] public int Y => Node.Y;
 
-    protected Unit(double hp, string name, int hunger, Node node, string unitType)
+    protected Unit(double hp, string name, int hunger, Node node, string unitType, double visibilityAngle, int visibilityRange)
     {
         Hp = hp;
         Name = name;
@@ -59,8 +69,10 @@ public abstract class Unit
         Direction = Direction.Bot;
         Node = node;
         UnitType = unitType;
+        VisibilityAngle = visibilityAngle;
+        VisibilityRange = visibilityRange;
 
-        Units.Add(this);
+        UnitIsHasCommandDict.Add(this, false);
     }
 
     public virtual void Step(Node node)
@@ -74,10 +86,12 @@ public abstract class Unit
     public virtual void Die()
     {
         Node.Unit = null;
-        Units.Remove(this);
+        UnitIsHasCommandDict.Remove(this);
     }
     
     public abstract void Eat();
 
     public abstract bool CanEat();
+
+    public abstract ICommand? GetNextCommand();
 }
