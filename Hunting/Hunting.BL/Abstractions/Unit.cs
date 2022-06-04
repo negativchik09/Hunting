@@ -72,9 +72,8 @@ public abstract class Unit
         Units.Add(this);
     }
 
-    public virtual UnitCommandExecutionResult Step()
+    public virtual UnitCommandExecutionResult Step(Node node)
     {
-        var node = NodeAggregator.NeighbourNode(Node, Direction);
         if (node == null)
         {
             return UnitCommandExecutionResult.UnableExecute;
