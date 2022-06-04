@@ -57,7 +57,10 @@ public class Rabbit : Unit
         {
             if (CanEat())
             {
-                return new UnitEatCommand($"{UnitType} {Name} ate grass at {Node.X}:{Node.Y} and changed surface to ground");
+                return new UnitEatCommand($"{UnitType} {Name} ate grass at {Node.X}:{Node.Y} and changed surface to ground")
+                {
+                    Contract = new UnitEatContract(this)
+                };
             }
             
             var grass = Pathfinder.Fow(this)
@@ -65,7 +68,7 @@ public class Rabbit : Unit
 
             if (grass != null)
             {
-                return new MoveUnitCommand($"{UnitType} {Name} found grass at {grass.X}:{grass.Y} and on way to it")
+                return new MoveUnitCommand($"{UnitType} {Name} found grass at {grass.X}:{grass.Y} and on it's way to it")
                 {
                     Contract = new MoveUnitContract(this, grass)
                 };
@@ -81,7 +84,7 @@ public class Rabbit : Unit
         var randPoint = fowPoints[randIndex];
         
         return new MoveUnitCommand(
-            $"{UnitType} {Name} hasn`t found grass or enemies in fow at {Node.X}:{Node.Y} and moving to {randPoint.X}:{randPoint.Y}")
+            $"{UnitType} {Name} hasn`t found grass or enemies in it's FOW at {Node.X}:{Node.Y} and moving to {randPoint.X}:{randPoint.Y}")
         {
             Contract = new MoveUnitContract(this, randPoint)
         };
