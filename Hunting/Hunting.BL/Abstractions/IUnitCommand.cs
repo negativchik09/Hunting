@@ -6,6 +6,4 @@ public interface IUnitCommand<in TParams> : ICommand<TParams, UnitCommandExecuti
     where TParams : IContract
 {
     Unit Unit { get; init; }
-    int Priority { get; }
-    double Duration { get; internal set; }
 }
