@@ -33,8 +33,6 @@ public class Wolf : Unit
 
     public override ICommand GetNextCommand()
     {
-        UnitIsHasCommandDict[this] = false;
-        
         var prey = Pathfinder.Fow(this)
            .FirstOrDefault(x => x.Unit != null && x.Unit.UnitType == nameof(Rabbit))?.Unit;
 
@@ -107,6 +105,8 @@ public class Wolf : Unit
         var fowPoints = Pathfinder.Fow(this)
             .Where(NodeAggregator.CanStepOnNode)
             .ToList();
+        
+        if (!fowPoints.Any()) return null;
 
         var randIndex = new Random().Next(0, fowPoints.Count);
 

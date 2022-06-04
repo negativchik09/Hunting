@@ -15,6 +15,7 @@ internal static class Pathfinder
             unit.VisibilityAngle);
 
         var start = unit.Node;
+        var resultList = new HashSet<Node>();
         foreach (var node in nodes)
         {
             int xRange = node.X - start.X;
@@ -28,11 +29,11 @@ internal static class Pathfinder
             {
                 current = checkQueue.Dequeue();
 
-                if (current == node)
+                if (nodes.Contains(current))
                 {
-                    yield return node;
+                    resultList.Add(current);
                 }
-                
+
                 if (current.Surface == Surface.Tree)
                 {
                     break;
@@ -56,6 +57,8 @@ internal static class Pathfinder
                 EnqueueIfNotNull(neighbour, checkQueue);
             }
         }
+
+        return resultList;
     }
 
     public static Direction OppositeDirectionByNodes(Node first, Node second)
@@ -102,7 +105,7 @@ internal static class Pathfinder
             Queue<Node> nodes = new Queue<Node>();
             Node? nextStep = null;
             
-            while (result?.TryPop(out nextStep) != true)
+            while (result?.TryPop(out nextStep) == true)
             {
                 EnqueueIfNotNull(nextStep, nodes);
             }
@@ -111,7 +114,7 @@ internal static class Pathfinder
         };
         return new MovingPathFindResult
         {
-            CanMove = result == null,
+            CanMove = result != null,
             Steps = steps()
         };
     }
@@ -131,12 +134,10 @@ internal static class Pathfinder
         for (var i = 0; i < distanceDict[end]; i++)
         {
             way.Push(current);
-            current = NodeAggregator.NeighbouringNodes(current, NeighbourType.Side)
-                .Where(NodeAggregator.CanStepOnNode)
-                .First(x => distanceDict[x] == distanceDict[current] - 1);
+            current = distanceDict.Keys
+                .Intersect(NodeAggregator.NeighbouringNodes(current, NeighbourType.Side))
+                .First(x => distanceDict[current] - 1 == distanceDict[x]);
         }
-
-        way.Push(current);
 
         return way;
     }
@@ -145,7 +146,7 @@ internal static class Pathfinder
     {
         var list = new List<Node>() { start };
         var visited = new List<Node>();
-        for (var i = 0; list.Count > 0; i++)
+        for (var i = 0; list.Count > 0 && i < 5; i++)
         {
             foreach (var node in list)
             {
@@ -154,7 +155,7 @@ internal static class Pathfinder
             }
 
             IEnumerable<Node> nodes = list
-                .Select(node => NodeAggregator.NeighbouringNodes(start, NeighbourType.Side)
+                .Select(node => NodeAggregator.NeighbouringNodes(node, NeighbourType.Side)
                     .Where(NodeAggregator.CanStepOnNode)
                     .Except(visited))
                 .Aggregate((x, y) => x.Concat(y));

@@ -45,7 +45,7 @@ public class CreateUnitCommand : IUserCommand<CreateUnitContract>
                 return false;
             }
 
-            if (contract.UnitType is not nameof(Wolf) or nameof(Rabbit) or nameof(Huntsman))
+            if (contract.UnitType is not nameof(Wolf) and not nameof(Rabbit) and not nameof(Huntsman))
             {
                 State = UserCommandExecutionResult.InvalidUnitType;
                 return false;

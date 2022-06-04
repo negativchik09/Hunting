@@ -21,11 +21,13 @@ public class Gateway
 
     public void ExecuteOneTurn()
     {
+        var pairs = CommandExecutor.Instance.MakeOneTurn().ToList();
+        var dict = new Dictionary<string, bool>(
+            pairs);
         OnMapUpdated(
             new MapUpdateEventParameters(
                 NodeAggregator.Nodes, 
-                new Dictionary<string, bool>(
-                    CommandExecutor.Instance.MakeOneTurn()),
+                dict,
                 CommandExecutor.Instance.TurnNumber));
     }
 

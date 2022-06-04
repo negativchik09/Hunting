@@ -123,11 +123,26 @@ internal static class NodeAggregator
 
     public static IEnumerable<Node> Segment(Node? node, Direction direction, int range, double segmentRadians)
     {
-        List<Node> nodes = VectorFromNode(node, direction).Take(range).ToList();
+        List<Node> nodes = new List<Node>() { node };
 
+        for (int i = 0; i < range; i++)
+        {
+            var buffer = new List<Node>();
+            foreach (var node_ in nodes)
+            {
+                buffer.AddRange(NeighbouringNodes(node_, NeighbourType.Diagonal)
+                    .Except(nodes)
+                    .Except(buffer));
+            }
+            nodes.AddRange(buffer);
+        }
+
+        nodes.Remove(node);
+
+        /*
         double phi = segmentRadians / 2;
 
-        int height = (int)Math.Round(range * Math.Sin(phi));
+        int height = Math.Abs((int)Math.Round(range * Math.Sin(phi)));
         int vectorSize;
         double tanPhi = Math.Tan(phi);
         int diff = range - nodes.Count;
@@ -162,7 +177,7 @@ internal static class NodeAggregator
                         .Skip(pivot)
                         .Take(vectorSize));
             }
-        }
+        }*/
 
         return nodes;
     }
@@ -174,8 +189,21 @@ internal static class NodeAggregator
 
     public static bool CanStepOnNode(Node x)
     {
-        return x.Surface != Surface.Tree
-               && x.Surface != Surface.Water
-               && x.Unit != null;
+        if (x.Surface == Surface.Tree)
+        {
+            return false;
+        }
+
+        if (x.Surface == Surface.Water)
+        {
+            return false;
+        }
+
+        if (x.Unit != null)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

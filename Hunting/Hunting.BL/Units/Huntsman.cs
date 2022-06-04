@@ -33,8 +33,6 @@ public class Huntsman : Unit
 
     public override ICommand GetNextCommand()
     {
-        UnitIsHasCommandDict[this] = false;
-        
         if (Hunger < 20)
         {
             if (CanEat())
@@ -71,6 +69,8 @@ public class Huntsman : Unit
             .Where(NodeAggregator.CanStepOnNode)
             .ToList();
 
+        if (!fowPoints.Any()) return null;
+        
         var randIndex = new Random().Next(0, fowPoints.Count);
 
         var randPoint = fowPoints[randIndex];

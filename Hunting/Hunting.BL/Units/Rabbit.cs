@@ -8,7 +8,7 @@ namespace Hunting.BL.Units;
 
 public class Rabbit : Unit
 {
-    internal Rabbit(string name, Node? node) : base(20, name, 20, node, nameof(Rabbit), 360, 7)
+    internal Rabbit(string name, Node? node) : base(20, name, 20, node, nameof(Rabbit), 360, 3)
     { }
 
     public override void Eat()
@@ -24,8 +24,7 @@ public class Rabbit : Unit
 
     public override ICommand GetNextCommand()
     {
-        UnitIsHasCommandDict[this] = false;
-        
+        UnitIsHasCommandDict[this] = true;
         var enemy = Pathfinder.Fow(this)
             .FirstOrDefault(x => x.Unit != null && x.Unit.UnitType != nameof(Rabbit))?.Unit;
         
@@ -77,13 +76,15 @@ public class Rabbit : Unit
             }
         }
         
-        var fowPoints = Pathfinder.Fow(this)
-            .Where(NodeAggregator.CanStepOnNode)
+        var fowPoints = Pathfinder.Fow(this);
+        var filtered = fowPoints.Where(x => NodeAggregator.CanStepOnNode(x))
             .ToList();
 
-        var randIndex = new Random().Next(0, fowPoints.Count);
+        if (!filtered.Any()) return null;
+        
+        var randIndex = new Random().Next(0, filtered.Count);
 
-        var randPoint = fowPoints[randIndex];
+        var randPoint = filtered[randIndex];
         
         return new MoveUnitCommand(
             $"{UnitType} {Name} hasn`t found grass or enemies in it's FOW at {Node.X}:{Node.Y} and moving to {randPoint.X}:{randPoint.Y}")
