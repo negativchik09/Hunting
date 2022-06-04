@@ -16,11 +16,11 @@ public static class CommandParser
         switch (command[0])
         {
             case CreateUnitCommandText:
-                return CreateUnitCommandParse(command[1..^1], commandText);
+                return CreateUnitCommandParse(command[1..^0], commandText);
             case RemoveUnitCommandText:
-                return RemoveUnitCommandParse(command[1..^1], commandText);
+                return RemoveUnitCommandParse(command[1..^0], commandText);
             case ChangeSurfaceCommandText:
-                return ChangeSurfaceCommandParse(command[1..^1], commandText);
+                return ChangeSurfaceCommandParse(command[1..^0], commandText);
             default:
                 return new ParsingResult(false);
         }
