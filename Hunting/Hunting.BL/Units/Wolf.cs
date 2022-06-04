@@ -9,23 +9,13 @@ public class Wolf : Unit
     internal Wolf(string name, Node? node) : base(100, name, 100, node, nameof(Wolf))
     { }
 
-    public override UnitCommandExecutionResult Step()
+    public override void Eat()
     {
         throw new NotImplementedException();
     }
 
-    public override UnitCommandExecutionResult TurnLeft()
+    public override bool CanEat()
     {
-        throw new NotImplementedException();
-    }
-
-    public override UnitCommandExecutionResult TurnRight()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override UnitCommandExecutionResult Eat()
-    {
-        throw new NotImplementedException();
+        if (NodeAggregator.NeighbouringNodes(Node, NeighbourType.Diagonal).Any(x => x.Meat.Length))
     }
 }

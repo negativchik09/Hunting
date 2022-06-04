@@ -105,7 +105,11 @@ internal static class Pathfinder
     
     private static Stack<Node>? FindWay(Node start, Node end)
     {
-        var distanceDict = NodeAggregator.Nodes.ToDictionary(x => x, x => -1);
+        var distanceDict = NodeAggregator.Nodes
+            .Where(x => x.Surface != Surface.Tree 
+                        && x.Surface != Surface.Water
+                        && x.Unit != null)
+            .ToDictionary(x => x, x => -1);
         SetDistances(start, distanceDict);
         var way = new Stack<Node>();
         if (distanceDict[end] == -1)
@@ -117,6 +121,9 @@ internal static class Pathfinder
         {
             way.Push(current);
             current = NodeAggregator.NeighbouringNodes(current, NeighbourType.Side)
+                .Where(x => x.Surface != Surface.Tree 
+                            && x.Surface != Surface.Water
+                            && x.Unit != null)
                 .First(x => distanceDict[x] == distanceDict[current] - 1);
         }
 
@@ -138,7 +145,11 @@ internal static class Pathfinder
             }
 
             IEnumerable<Node> nodes = list
-                .Select(node => NodeAggregator.NeighbouringNodes(start, NeighbourType.Side).Except(visited))
+                .Select(node => NodeAggregator.NeighbouringNodes(start, NeighbourType.Side)
+                    .Where(x => x.Surface != Surface.Tree 
+                                && x.Surface != Surface.Water
+                                && x.Unit != null)
+                    .Except(visited))
                 .Aggregate((x, y) => x.Concat(y));
 
             list.Clear();

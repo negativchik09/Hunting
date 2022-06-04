@@ -82,7 +82,7 @@ public class Gateway
             {
                 nodes.Add(new Node()
                 {
-                    Meat = Array.Empty<Meat>(),
+                    Meat = new List<Meat>(),
                     Surface = Surface.Grass,
                     Unit = null,
                     X = j,

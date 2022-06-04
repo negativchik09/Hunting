@@ -8,7 +8,7 @@ public class Node : IEquatable<Node>
 {
     public Unit? Unit { get; set; }
     public Surface Surface { get; set; }
-    public Meat[] Meat { get; set; }
+    public List<Meat> Meat { get; set; }
     public int X { get; set; }
     public int Y { get; set; }
     [JsonIgnore]

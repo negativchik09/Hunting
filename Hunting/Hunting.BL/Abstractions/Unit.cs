@@ -13,10 +13,7 @@ public abstract class Unit
 
     public double Hp
     {
-        get
-        {
-            return _hp;
-        }
+        get { return _hp; }
         set
         {
             if (value <= 0)
@@ -32,10 +29,7 @@ public abstract class Unit
 
     public double Hunger
     {
-        get
-        {
-            return _hunger;
-        }
+        get { return _hunger; }
         set
         {
             if (value < 0)
@@ -52,14 +46,11 @@ public abstract class Unit
     public int VisibilityRange { get; init; }
     public double VisibilityAngle { get; init; }
     public Direction Direction { get; private set; }
-    [JsonIgnore]
-    public Node Node { get; internal set; }
-    [JsonIgnore]
-    public int X => Node.X;
+    [JsonIgnore] public Node Node { get; internal set; }
+    [JsonIgnore] public int X => Node.X;
 
-    [JsonIgnore]
-    public int Y => Node.Y;
-    
+    [JsonIgnore] public int Y => Node.Y;
+
     protected Unit(double hp, string name, double hunger, Node node, string unitType)
     {
         Hp = hp;
@@ -72,38 +63,21 @@ public abstract class Unit
         Units.Add(this);
     }
 
-    public virtual UnitCommandExecutionResult Step(Node node)
+    public virtual void Step(Node node)
     {
-        if (node == null)
-        {
-            return UnitCommandExecutionResult.UnableExecute;
-        }
-
+        if (node.Surface is Surface.Tree or Surface.Water || node.Unit == null) return;
+        Node.Unit = null;
+        node.Unit = this;
         Node = node;
-        return UnitCommandExecutionResult.Executed;
     }
 
-    public virtual UnitCommandExecutionResult TurnLeft()
-    {
-        Direction = Direction.LeftSide();
-        return UnitCommandExecutionResult.Executed;
-    }
-
-    public virtual UnitCommandExecutionResult TurnRight()
-    {
-        Direction = Direction.RightSide();
-        return UnitCommandExecutionResult.Executed;
-    }
-
-    public virtual UnitCommandExecutionResult Die()
+    public virtual void Die()
     {
         Node.Unit = null;
-        return Units.Remove(this) 
-            ? UnitCommandExecutionResult.Executed 
-            : UnitCommandExecutionResult.UnableExecute;
+        Units.Remove(this);
     }
     
-    public abstract UnitCommandExecutionResult Eat();
+    public abstract void Eat();
 
     public abstract bool CanEat();
 }

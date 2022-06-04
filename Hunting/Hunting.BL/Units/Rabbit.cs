@@ -6,26 +6,23 @@ namespace Hunting.BL.Units;
 
 public class Rabbit : Unit
 {
-    internal Rabbit(string name, Node? node) : base(100, name, 100, node, nameof(Rabbit))
+    internal Rabbit(string name, Node? node) : base(20, name, 20, node, nameof(Rabbit))
     { }
 
-    public override UnitCommandExecutionResult Step()
+    public override void Eat()
     {
-        throw new NotImplementedException();
+        Hunger += 10;
+        Node.Surface = Surface.Ground;
     }
 
-    public override UnitCommandExecutionResult TurnLeft()
+    public override bool CanEat()
     {
-        throw new NotImplementedException();
+        return Node.Surface == Surface.Grass;
     }
 
-    public override UnitCommandExecutionResult TurnRight()
+    public override void Die()
     {
-        throw new NotImplementedException();
-    }
-
-    public override UnitCommandExecutionResult Eat()
-    {
-        throw new NotImplementedException();
+        Node.Meat
+        base.Die();
     }
 }
