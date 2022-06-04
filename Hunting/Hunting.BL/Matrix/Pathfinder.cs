@@ -83,24 +83,41 @@ internal static class Pathfinder
 
     public static MovingPathFindResult FindPath(Unit unit, Node node)
     {
-        return null;
+        var result = FindWay(unit.Node, node);
+        var steps = () =>
+        {
+            Queue<Node> nodes = new Queue<Node>();
+            Node? nextStep = null;
+            
+            while (result?.TryPop(out nextStep) != true)
+            {
+                EnqueueIfNotNull(nextStep, nodes);
+            }
+
+            return nodes;
+        };
+        return new MovingPathFindResult
+        {
+            CanMove = result == null,
+            Steps = steps()
+        };
     }
     
-    private static Stack<Node> FindWay(Node start, Node end)
+    private static Stack<Node>? FindWay(Node start, Node end)
     {
-        SetDistances(start);
-        var distanceDict = new Dictionary<Node, int>()
+        var distanceDict = NodeAggregator.Nodes.ToDictionary(x => x, x => -1);
+        SetDistances(start, distanceDict);
         var way = new Stack<Node>();
-        if (end.Distance == -1)
+        if (distanceDict[end] == -1)
         {
             return null;
         }
         var current = end;
-        for (var i = 0; i < end.Distance; i++)
+        for (var i = 0; i < distanceDict[end]; i++)
         {
             way.Push(current);
             current = NodeAggregator.NeighbouringNodes(current, NeighbourType.Side)
-                .First(x => x.Distance == current.Distance - 1);
+                .First(x => distanceDict[x] == distanceDict[current] - 1);
         }
 
         way.Push(current);
@@ -108,7 +125,7 @@ internal static class Pathfinder
         return way;
     }
 
-    private static void SetDistances(Node start)
+    private static void SetDistances(Node start, IDictionary<Node, int> dictionary)
     {
         var list = new List<Node>() { start };
         var visited = new List<Node>();
@@ -116,12 +133,12 @@ internal static class Pathfinder
         {
             foreach (var node in list)
             {
-                node.Distance = i;
+                dictionary[node] = i;
                 visited.Add(node);
             }
 
             IEnumerable<Node> nodes = list
-                .Select(node => _relationalList[node].Except(visited))
+                .Select(node => NodeAggregator.NeighbouringNodes(start, NeighbourType.Side).Except(visited))
                 .Aggregate((x, y) => x.Concat(y));
 
             list.Clear();
