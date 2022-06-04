@@ -144,6 +144,7 @@ namespace Hunting.App
 
             foreach (Node node in p.Nodes.ToList())
             {
+                ((GameField.Children[node.Y * 40 + node.X] as Border).Child as Image).Source = null;
                 switch ((int)node.Surface)
                 {
                     case 0:
@@ -166,10 +167,6 @@ namespace Hunting.App
                 }
                 if (node.Unit != null)
                 {
-                    if (((GameField.Children[node.Y * 40 + node.X] as Border).Child as Image).Source != null)
-                    {
-                        ((GameField.Children[node.Y * 40 + node.X] as Border).Child as Image).Source = null;
-                    }
                     switch (node.Unit.UnitType)
                     {
                         case nameof(Rabbit):
