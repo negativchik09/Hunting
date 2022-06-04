@@ -55,5 +55,6 @@ public class ChangeSurfaceCommand : IUserCommand<ChangeSurfaceContract>
     public string CommandText { get; }
     public Func<ChangeSurfaceContract, bool> CanExecute => _canExecute;
     public Action<ChangeSurfaceContract> Execute => _execute;
-    public UserCommandExecutionResult State { get; private set; }
+    public UserCommandExecutionResult State { get; set; }
+    public ChangeSurfaceContract Contract { get; set; }
 }

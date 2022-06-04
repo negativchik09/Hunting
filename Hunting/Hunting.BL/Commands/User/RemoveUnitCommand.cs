@@ -52,8 +52,10 @@ public class RemoveUnitCommand : IUserCommand<RemoveUnitContract>
 
     public Action<RemoveUnitContract> Execute => _execute;
 
-    public UserCommandExecutionResult State { get; private set; }
+    public UserCommandExecutionResult State { get; set; }
 
     public string CommandText { get; private set; }
+
+    public RemoveUnitContract Contract { get; set; }
 }
 

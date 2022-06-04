@@ -94,9 +94,21 @@ public class Gateway
         return JsonConvert.SerializeObject(nodes, Formatting.Indented);
     }
 
-    public UserCommandExecutionResult AddCommand(string command)
+    public void AddCommand(string command)
     {
-        return UserCommandExecutionResult.Executed; // TODO: implementation
+        var parsingResult = CommandParser.Parse(command);
+        CommandExecutor.Instance.AddCommand(parsingResult.Command);
+        return;
+    }
+
+    public void AddCommandRange(string commands)
+    {
+        string[] splitted_commands = commands.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        foreach (string command in splitted_commands)
+        {
+            AddCommand(command);
+        }
+        return;
     }
 
     public event EventHandler<MapUpdateEventParameters>? MapUpdated;

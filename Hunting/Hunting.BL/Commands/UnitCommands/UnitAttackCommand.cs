@@ -51,7 +51,9 @@ internal class UnitAttackCommand : IUnitCommand<UnitAttackContract>
 
     public Action<UnitAttackContract> Execute => _execute;
 
-    public UnitCommandExecutionResult State { get; private set; }
+    public UnitCommandExecutionResult State { get; set; }
 
     public string CommandText { get; }
+
+    public UnitAttackContract Contract { get; set; }
 }

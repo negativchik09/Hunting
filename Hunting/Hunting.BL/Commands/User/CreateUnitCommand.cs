@@ -75,7 +75,9 @@ public class CreateUnitCommand : IUserCommand<CreateUnitContract>
 
     public Action<CreateUnitContract> Execute => _execute;
 
-    public UserCommandExecutionResult State { get; private set; }
+    public UserCommandExecutionResult State { get; set; }
 
     public string CommandText { get; }
+
+    public CreateUnitContract Contract { get; set; }
 }
