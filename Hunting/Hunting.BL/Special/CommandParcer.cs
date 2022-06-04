@@ -1,15 +1,16 @@
 ﻿using Hunting.BL.Commands.Contracts;
 using Hunting.BL.Commands.User;
+using Hunting.BL.Enum;
 
 namespace Hunting.BL.Special;
 
-public class CommandParser // TODO: Add ParsingResultEnum. Validate parameters types
+public static class CommandParser // TODO: Add ParsingResultEnum. Validate parameters types
 {
     private const string CreateUnitCommandText = "create_unit";
     private const string RemoveUnitCommandText = "remove_unit";
     private const string ChangeSurfaceCommandText = "change_surface";
 
-    public ParsingResult Parse(string commandText)
+    public static ParsingResult Parse(string commandText)
     {
         string[] command = commandText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         switch (command[0])
@@ -25,54 +26,58 @@ public class CommandParser // TODO: Add ParsingResultEnum. Validate parameters t
         }
     }
 
-    private ParsingResult RemoveUnitCommandParse(string[] parameters, string fullText)
+    private static ParsingResult RemoveUnitCommandParse(string[] parameters, string fullText)
     {
-        // TODO: Parsing command with coords
-        switch (parameters.Length)
+        var command = new RemoveUnitCommand(fullText);
+        if (parameters.Length != 2)
         {
-            case 2:
-            {
-                return new ParsingResult(true);
-            }
-            default:
-            {
-                throw new ArgumentOutOfRangeException();
-            }
+            command.State = UserCommandExecutionResult.ParsingError;
+            return new ParsingResult(false, command, null);
         }
+        var contract = new RemoveUnitContract(
+            Convert.ToInt32(parameters[0]),
+            Convert.ToInt32(parameters[1])
+        );
+
+        command.Contract = contract;
+
+        return new ParsingResult(true, command, contract);
     }
 
-    private ParsingResult CreateUnitCommandParse(string[] parameters, string fullText)
+    private static ParsingResult CreateUnitCommandParse(string[] parameters, string fullText)
     {
+        var command = new CreateUnitCommand(fullText);
         if (parameters.Length != 4)
         {
-            return new ParsingResult(false);
+            return new ParsingResult(false, command, null);
         }
-        
-        var command = new CreateUnitCommand(fullText);
         var contract = new CreateUnitContract(
             Convert.ToInt32(parameters[0]),
             Convert.ToInt32(parameters[1]),
             parameters[2],
             parameters[3]
         );
+
+        command.Contract = contract;
 
         return new ParsingResult(true, command, contract);
     }
     
-    private ParsingResult ChangeSurfaceCommandParse(string[] parameters, string fullText)
+    private static ParsingResult ChangeSurfaceCommandParse(string[] parameters, string fullText)
     {
+        var command = new CreateUnitCommand(fullText);
         if (parameters.Length != 4)
         {
-            return new ParsingResult(false);
+            return new ParsingResult(false, command, null);
         }
-        
-        var command = new CreateUnitCommand(fullText);
         var contract = new CreateUnitContract(
             Convert.ToInt32(parameters[0]),
             Convert.ToInt32(parameters[1]),
             parameters[2],
             parameters[3]
         );
+
+        command.Contract = contract;
 
         return new ParsingResult(true, command, contract);
     }

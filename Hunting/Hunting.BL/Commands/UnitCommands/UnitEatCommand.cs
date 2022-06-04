@@ -29,7 +29,9 @@ internal class UnitEatCommand : IUnitCommand<UnitEatContract>
 
     public Action<UnitEatContract> Execute => _execute;
 
-    public UnitCommandExecutionResult State { get; private set; }
+    public UnitCommandExecutionResult State { get; set; }
 
     public string CommandText { get; }
+
+    public UnitEatContract Contract { get; set; }
 }

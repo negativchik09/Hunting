@@ -5,6 +5,7 @@ public enum UserCommandExecutionResult
     Executed,
     Valid,
     UnknownCommand,
+    ParsingError,
     InvalidCoords,
     InvalidSurface,
     InvalidUnitType,

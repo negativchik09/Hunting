@@ -51,7 +51,8 @@ public class MoveUnitCommand : IUnitCommand<MoveUnitContract>
 
     public Action<MoveUnitContract> Execute => _execute;
 
-    public UnitCommandExecutionResult State { get; private set; }
+    public UnitCommandExecutionResult State { get; set; }
 
     public string CommandText { get; }
+    public MoveUnitContract Contract { get; set; }
 }
