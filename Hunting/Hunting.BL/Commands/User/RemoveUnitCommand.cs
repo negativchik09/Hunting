@@ -18,15 +18,15 @@ public class RemoveUnitCommand : IUserCommand<RemoveUnitContract>
         {
             if (contract.RemoveUnitContractType == RemoveUnitContractType.ByCoordinates)
             {
-                if (contract.X >= NodeAggregator.MatrixSize ||
-                    contract.X < 0 ||
-                    contract.Y >= NodeAggregator.MatrixSize ||
-                    contract.Y < 0)
+                if (contract.ByCoords.X >= NodeAggregator.MatrixSize ||
+                    contract.ByCoords.X < 0 ||
+                    contract.ByCoords.Y >= NodeAggregator.MatrixSize ||
+                    contract.ByCoords.Y < 0)
                 {
                     State = UserCommandExecutionResult.InvalidCoords;
                     return false;
                 }
-                var node = NodeAggregator.GetNode(contract.X, contract.Y);
+                var node = NodeAggregator.GetNode(contract.ByCoords.X, contract.ByCoords.Y);
                 if (node.Unit == null)
                 {
                     State = UserCommandExecutionResult.NoUnitOnNode;
@@ -35,7 +35,7 @@ public class RemoveUnitCommand : IUserCommand<RemoveUnitContract>
             }
             else
             {
-                if (!Unit.Units.Select(x => x.Name).Contains(contract.UnitName))
+                if (!Unit.Units.Select(x => x.Name).Contains(contract.ByName.UnitName))
                 {
                     State = UserCommandExecutionResult.NoUnitWithThisName;
                     return false;
@@ -45,19 +45,21 @@ public class RemoveUnitCommand : IUserCommand<RemoveUnitContract>
             return true;
         };
 
-        _execute = contract => 
+        _execute = contract =>
         {
-            Node node;
-            if (contract.RemoveUnitContractType == RemoveUnitContractType.ByCoordinates)
+            Func<Unit, bool> func = contract.RemoveUnitContractType switch
             {
-                node = NodeAggregator.GetNode(contract.X, contract.Y);
-            }
-            else
-            {
-                node = Unit.Units.First(x => x.Name == contract.UnitName).Node;
-            }
-            Unit.Units.Remove(node.Unit);
-            node.Unit = null;
+                RemoveUnitContractType.ByCoordinates => (unit) =>
+                    unit.X == contract.ByCoords.X && unit.Y == contract.ByCoords.Y,
+                RemoveUnitContractType.ByName => (unit) => unit.Name == contract.ByName.UnitName,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            var unit = Unit.Units.First(func);
+            
+            Unit.Units.Remove(unit);
+            
+            unit.Node.Unit = null;
         };
 
     }

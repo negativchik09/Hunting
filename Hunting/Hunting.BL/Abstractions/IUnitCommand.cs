@@ -3,6 +3,7 @@
 namespace Hunting.BL.Abstractions;
 
 public interface IUnitCommand<in TParams> : ICommand<TParams, UnitCommandExecutionResult>
+    where TParams : IContract
 {
     Unit Unit { get; init; }
     int Priority { get; }

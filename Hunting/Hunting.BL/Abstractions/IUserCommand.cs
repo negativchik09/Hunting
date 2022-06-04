@@ -2,7 +2,5 @@
 
 namespace Hunting.BL.Abstractions;
 
-public interface IUserCommand<in TParams> : ICommand<TParams, UserCommandExecutionResult>
-{
-    string CommandText { get; }
-}
+public interface IUserCommand<in TParams> : ICommand<TParams, UserCommandExecutionResult> where TParams : IContract
+{ }

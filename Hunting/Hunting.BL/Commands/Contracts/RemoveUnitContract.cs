@@ -1,25 +1,23 @@
-﻿namespace Hunting.BL.Commands.Contracts;
+﻿using Hunting.BL.Abstractions;
 
-public record RemoveUnitContract
+namespace Hunting.BL.Commands.Contracts;
+
+public record RemoveUnitContract : IContract
 {
-    public RemoveUnitContract(int X, int Y)
+    public RemoveUnitContract(int x, int y)
     {
-        this.X = X;
-        this.Y = Y;
-        this.UnitName = null;
+        ByCoords = new RemoveUnitByCoordsContract(x, y);
+        ByName = null;
         RemoveUnitContractType = RemoveUnitContractType.ByCoordinates;
     }
     
-    public RemoveUnitContract(string UnitName)
+    public RemoveUnitContract(string unitName)
     {
-        this.X = -1;
-        this.Y = -1;
-        this.UnitName = UnitName;
+        ByName = new RemoveUnitByNameContract(unitName);
+        ByCoords = null;
         RemoveUnitContractType = RemoveUnitContractType.ByName;
     }
-
-    public int X { get; init; }
-    public int Y { get; init; }
-    public string? UnitName { get; init; }
+    public RemoveUnitByCoordsContract ByCoords { get; init; }
+    public RemoveUnitByNameContract ByName { get; init; }
     public RemoveUnitContractType RemoveUnitContractType { get; init; }
 }

@@ -1,3 +1,5 @@
-﻿namespace Hunting.BL.Commands.Contracts;
+﻿using Hunting.BL.Abstractions;
 
-public record CreateUnitContract(int X, int Y, string UnitType, string UnitName);
+namespace Hunting.BL.Commands.Contracts;
+
+public record CreateUnitContract(int X, int Y, string UnitType, string UnitName) : IContract;
