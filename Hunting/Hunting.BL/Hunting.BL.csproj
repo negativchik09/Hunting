@@ -27,6 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Commands\Contracts\Enum" />
       <Folder Include="Commands\Unit" />
       <Folder Include="obj\Debug\net6.0\ref" />
     </ItemGroup>

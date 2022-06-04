@@ -85,4 +85,47 @@ internal static class Pathfinder
     {
         return null;
     }
+    
+    private static Stack<Node> FindWay(Node start, Node end)
+    {
+        SetDistances(start);
+        var distanceDict = new Dictionary<Node, int>()
+        var way = new Stack<Node>();
+        if (end.Distance == -1)
+        {
+            return null;
+        }
+        var current = end;
+        for (var i = 0; i < end.Distance; i++)
+        {
+            way.Push(current);
+            current = NodeAggregator.NeighbouringNodes(current, NeighbourType.Side)
+                .First(x => x.Distance == current.Distance - 1);
+        }
+
+        way.Push(current);
+
+        return way;
+    }
+
+    private static void SetDistances(Node start)
+    {
+        var list = new List<Node>() { start };
+        var visited = new List<Node>();
+        for (var i = 0; list.Count > 0; i++)
+        {
+            foreach (var node in list)
+            {
+                node.Distance = i;
+                visited.Add(node);
+            }
+
+            IEnumerable<Node> nodes = list
+                .Select(node => _relationalList[node].Except(visited))
+                .Aggregate((x, y) => x.Concat(y));
+
+            list.Clear();
+            list.AddRange(nodes);
+        }
+    }
 }

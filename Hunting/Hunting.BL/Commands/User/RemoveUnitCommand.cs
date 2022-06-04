@@ -16,30 +16,19 @@ public class RemoveUnitCommand : IUserCommand<RemoveUnitContract>
         CommandText = commandText;
         _canExecute = contract =>
         {
-            if (contract.RemoveUnitContractType == RemoveUnitContractType.ByCoordinates)
+            if (contract.X >= NodeAggregator.MatrixSize ||
+                contract.X < 0 ||
+                contract.Y >= NodeAggregator.MatrixSize ||
+                contract.Y < 0)
             {
-                if (contract.ByCoords.X >= NodeAggregator.MatrixSize ||
-                    contract.ByCoords.X < 0 ||
-                    contract.ByCoords.Y >= NodeAggregator.MatrixSize ||
-                    contract.ByCoords.Y < 0)
-                {
-                    State = UserCommandExecutionResult.InvalidCoords;
-                    return false;
-                }
-                var node = NodeAggregator.GetNode(contract.ByCoords.X, contract.ByCoords.Y);
-                if (node.Unit == null)
-                {
-                    State = UserCommandExecutionResult.NoUnitOnNode;
-                    return false;
-                }
+                State = UserCommandExecutionResult.InvalidCoords;
+                return false;
             }
-            else
+            var node = NodeAggregator.GetNode(contract.X, contract.Y);
+            if (node.Unit == null)
             {
-                if (!Unit.Units.Select(x => x.Name).Contains(contract.ByName.UnitName))
-                {
-                    State = UserCommandExecutionResult.NoUnitWithThisName;
-                    return false;
-                }
+                State = UserCommandExecutionResult.NoUnitOnNode;
+                return true;
             }
             State = UserCommandExecutionResult.Valid;
             return true;
@@ -47,13 +36,8 @@ public class RemoveUnitCommand : IUserCommand<RemoveUnitContract>
 
         _execute = contract =>
         {
-            Func<Unit, bool> func = contract.RemoveUnitContractType switch
-            {
-                RemoveUnitContractType.ByCoordinates => (unit) =>
-                    unit.X == contract.ByCoords.X && unit.Y == contract.ByCoords.Y,
-                RemoveUnitContractType.ByName => (unit) => unit.Name == contract.ByName.UnitName,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            Func<Unit, bool> func = (unit) =>
+                    unit.X == contract.X && unit.Y == contract.Y;
 
             var unit = Unit.Units.First(func);
             

@@ -18,13 +18,16 @@ public class CommandParser // TODO: Add ParsingResultEnum. Validate parameters t
                 return CreateUnitCommandParse(command[1..^1], commandText);
             case RemoveUnitCommandText:
                 return RemoveUnitCommandParse(command[1..^1], commandText);
+            case ChangeSurfaceCommandText:
+                return ChangeSurfaceCommandParse(command[1..^1], commandText);
             default:
                 return new ParsingResult(false);
         }
     }
 
-    private ParsingResult RemoveUnitCommandParse(string[] parameters, string commandText)
+    private ParsingResult RemoveUnitCommandParse(string[] parameters, string fullText)
     {
+        // TODO: Parsing command with coords
         switch (parameters.Length)
         {
             case 2:
@@ -39,6 +42,24 @@ public class CommandParser // TODO: Add ParsingResultEnum. Validate parameters t
     }
 
     private ParsingResult CreateUnitCommandParse(string[] parameters, string fullText)
+    {
+        if (parameters.Length != 4)
+        {
+            return new ParsingResult(false);
+        }
+        
+        var command = new CreateUnitCommand(fullText);
+        var contract = new CreateUnitContract(
+            Convert.ToInt32(parameters[0]),
+            Convert.ToInt32(parameters[1]),
+            parameters[2],
+            parameters[3]
+        );
+
+        return new ParsingResult(true, command, contract);
+    }
+    
+    private ParsingResult ChangeSurfaceCommandParse(string[] parameters, string fullText)
     {
         if (parameters.Length != 4)
         {
