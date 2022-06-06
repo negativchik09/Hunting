@@ -32,7 +32,12 @@ public class CommandExecutor
     public IEnumerable<KeyValuePair<string, bool>> MakeOneTurn()
     {
         TurnNumber += 1;
-        
+        foreach (var x in NodeAggregator.NodeList.Where(x =>
+                     x.Surface == Surface.Ground && x.TurnsAfterGrassEating != -1))
+        {
+            x.TurnsAfterGrassEating += 1;
+        }
+
         var continueList = new List<ICommand>();
         
         while (_queue.Count > 0)
@@ -91,12 +96,19 @@ public class CommandExecutor
                             break;
                         case UnitCommandExecutionResult.Executed:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
-                            Unit.UnitIsHasCommandDict[unitCommand.Unit] = false;
+                            Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = false;
                             break;
                         case UnitCommandExecutionResult.UnableExecute:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, false);
-                            Unit.UnitIsHasCommandDict[unitCommand.Unit] = false;
+                            if (Unit.Units.Contains(unitCommand.CommandUnit))
+                            {
+                                Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = false;
+                            }
                             break;
+                        case UnitCommandExecutionResult.None:
+                            throw new ArgumentException();
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
 
                     break;
@@ -116,12 +128,25 @@ public class CommandExecutor
                             break;
                         case UnitCommandExecutionResult.Executed:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
-                            Unit.UnitIsHasCommandDict[unitCommand.Unit] = false;
+                            Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = false;
                             break;
                         case UnitCommandExecutionResult.UnableExecute:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, false);
-                            Unit.UnitIsHasCommandDict[unitCommand.Unit] = false;
+                            if (Unit.Units.Contains(unitCommand.Contract.attackedUnit))
+                            {
+                                Unit.UnitIsHasCommandDict[unitCommand.Contract.attackedUnit] = false;
+                            }
+                            if (Unit.Units.Contains(unitCommand.Contract.attackingUnit))
+                            {
+                                Unit.UnitIsHasCommandDict[unitCommand.Contract.attackingUnit] = false;
+                            }
                             break;
+                        case UnitCommandExecutionResult.None:
+                            throw new ArgumentException();
+                        case null:
+                            throw new ArgumentNullException();
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
 
                     break;
@@ -141,20 +166,58 @@ public class CommandExecutor
                             break;
                         case UnitCommandExecutionResult.Executed:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
-                            Unit.UnitIsHasCommandDict[unitCommand.Unit] = false;
+                            Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = false;
                             break;
                         case UnitCommandExecutionResult.UnableExecute:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, false);
-                            Unit.UnitIsHasCommandDict[unitCommand.Unit] = false;
+                            if (Unit.Units.Contains(unitCommand.CommandUnit))
+                            {
+                                Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = false;
+                            }
                             break;
+                        case UnitCommandExecutionResult.None:
+                            throw new ArgumentException();
+                        case null:
+                            throw new ArgumentNullException();
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    break;
+                }
+                case RestUnitCommand unitCommand:
+                {
+                    if (unitCommand.CanExecute(unitCommand.Contract))
+                    {
+                        unitCommand?.Execute(unitCommand.Contract);
                     }
 
+                    switch (unitCommand?.State)
+                    {
+                        case UnitCommandExecutionResult.Executing:
+                            continueList.Add(unitCommand);
+                            pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
+                            break;
+                        case UnitCommandExecutionResult.Executed:
+                            pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
+                            Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = false;
+                            break;
+                        case UnitCommandExecutionResult.UnableExecute:
+                            pair = new KeyValuePair<string, bool>(unitCommand.CommandText, false);
+                            if (Unit.Units.Contains(unitCommand.CommandUnit))
+                            {
+                                Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = false;
+                            }
+                            break;
+                        case UnitCommandExecutionResult.None:
+                            throw new ArgumentException();
+                        case null:
+                            throw new ArgumentNullException();
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                     break;
                 }
             }
-
-            NodeAggregator.NodeList.SelectMany(x => x.Meat, (node, meat) => meat.TurnsBeforeDispose -= 1);
-            NodeAggregator.NodeList.Select(x => x.Meat.RemoveAll(meat => meat.TurnsBeforeDispose == 0));
 
             var units = Unit.UnitIsHasCommandDict.Keys;
 
@@ -171,7 +234,16 @@ public class CommandExecutor
             
             yield return pair;
         }
-
+        
+        NodeAggregator.NodeList.SelectMany(x => x.Meat, (node, meat) => meat.TurnsBeforeDispose -= 1);
+        NodeAggregator.NodeList.Select(x => x.Meat.RemoveAll(meat => meat.TurnsBeforeDispose == 0));
+        foreach (var node in NodeAggregator.NodeList.Where(x =>
+                     x.Surface == Surface.Ground && x.TurnsAfterGrassEating == 20))
+        {
+            node.TurnsAfterGrassEating = -1;
+            node.Surface = Surface.Grass;
+        }
+        
         foreach (var continueCommand in continueList)
         {
             AddCommand(continueCommand);
@@ -197,6 +269,7 @@ public class CommandExecutor
             nameof(UnitAttackCommand) => 10,
             nameof(MoveUnitCommand) => 15,
             nameof(UnitEatCommand) => 20,
+            nameof(RestUnitCommand) => 25,
             _ => throw new ArgumentOutOfRangeException()
         };
     }

@@ -121,6 +121,10 @@ internal static class Pathfinder
     
     private static Stack<Node>? FindWay(Node start, Node end)
     {
+        if (!NodeAggregator.CanStepOnNode(end))
+        {
+            return null;
+        }
         var distanceDict = NodeAggregator.Nodes
             .Where(NodeAggregator.CanStepOnNode)
             .ToDictionary(x => x, x => -1);

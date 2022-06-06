@@ -2,6 +2,7 @@
 using Hunting.BL.Commands.Contracts;
 using Hunting.BL.Enum;
 using Hunting.BL.Matrix;
+using Hunting.BL.Special;
 using Hunting.BL.Units;
 
 namespace Hunting.BL.Commands.User;
@@ -28,7 +29,7 @@ public class RemoveUnitCommand : IUserCommand<RemoveUnitContract>
             if (node.Unit == null)
             {
                 State = UserCommandExecutionResult.NoUnitOnNode;
-                return true;
+                return false;
             }
             State = UserCommandExecutionResult.Valid;
             return true;
@@ -42,8 +43,10 @@ public class RemoveUnitCommand : IUserCommand<RemoveUnitContract>
             var unit = Unit.Units.First(func);
             
             Unit.UnitIsHasCommandDict.Remove(unit);
-            
+
             unit.Node.Unit = null;
+
+            State = UserCommandExecutionResult.Executed;
         };
 
     }

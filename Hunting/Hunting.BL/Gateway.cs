@@ -72,6 +72,12 @@ public class Gateway
         NodeAggregator.NodeList = nodeList;
         OnMapUpdated(new MapUpdateEventParameters(NodeAggregator.Nodes));
         
+        foreach (var node in NodeAggregator.NodeList.Where(x =>
+                     x.Surface == Surface.Ground))
+        {
+            node.TurnsAfterGrassEating = -1;
+        }
+        
         return true;
     }
 

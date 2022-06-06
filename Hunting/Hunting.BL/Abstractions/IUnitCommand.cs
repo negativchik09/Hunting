@@ -5,5 +5,5 @@ namespace Hunting.BL.Abstractions;
 public interface IUnitCommand<TParams> : ICommand<TParams, UnitCommandExecutionResult>
     where TParams : IContract
 {
-    Unit Unit { get; }
+    Unit CommandUnit { get; }
 }

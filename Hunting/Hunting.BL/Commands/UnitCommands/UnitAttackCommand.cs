@@ -17,7 +17,17 @@ internal class UnitAttackCommand : IUnitCommand<UnitAttackContract>
 
         _canExecute = contract =>
         {
-            Unit = contract.attackingUnit;
+            CommandUnit = contract.attackingUnit;
+            if (!Unit.Units.Contains(contract.attackingUnit))
+            {
+                State = UnitCommandExecutionResult.UnableExecute;
+                return false;
+            }
+            if (!Unit.Units.Contains(contract.attackedUnit))
+            {
+                State = UnitCommandExecutionResult.UnableExecute;
+                return false;
+            }
             switch (contract.attackingUnit.UnitType)
             {
                 case nameof(Wolf):
@@ -33,7 +43,7 @@ internal class UnitAttackCommand : IUnitCommand<UnitAttackContract>
         _execute = contract =>
         {
             if (!_canExecute(contract)) return;
-            Unit = contract.attackingUnit;
+            CommandUnit = contract.attackingUnit;
             switch (contract.attackingUnit.UnitType)
             {
                 case nameof(Wolf):
@@ -60,5 +70,5 @@ internal class UnitAttackCommand : IUnitCommand<UnitAttackContract>
     public string CommandText { get; }
 
     public UnitAttackContract Contract { get; set; }
-    public Unit Unit { get; private set; }
+    public Unit CommandUnit { get; private set; }
 }

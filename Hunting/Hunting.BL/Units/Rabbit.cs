@@ -15,6 +15,7 @@ public class Rabbit : Unit
     {
         Hunger += 10;
         Node.Surface = Surface.Ground;
+        Node.TurnsAfterGrassEating = 0;
     }
 
     public override bool CanEat()
@@ -45,7 +46,7 @@ public class Rabbit : Unit
 
             if (target == null)
             {
-                return null;
+                return StepOnRandomInFow();
             }
 
             return new MoveUnitCommand($"{UnitType} {Name} tried to escape from enemy to {target.X}:{target.Y}")
@@ -54,36 +55,44 @@ public class Rabbit : Unit
             };
         }
 
-        if (Hunger < 10)
+        if (Hunger >= 10) return StepOnRandomInFow();
+        
+        if (CanEat())
         {
-            if (CanEat())
+            return new UnitEatCommand($"{UnitType} {Name} ate grass at {Node.X}:{Node.Y} and changed surface to ground")
             {
-                return new UnitEatCommand($"{UnitType} {Name} ate grass at {Node.X}:{Node.Y} and changed surface to ground")
-                {
-                    Contract = new UnitEatContract(this)
-                };
-            }
-            
-            var grass = Pathfinder.Fow(this)
-                .FirstOrDefault(x => x.Surface == Surface.Grass);
-
-            if (grass != null)
-            {
-                return new MoveUnitCommand($"{UnitType} {Name} found grass at {grass.X}:{grass.Y} and on it's way to it")
-                {
-                    Contract = new MoveUnitContract(this, grass)
-                };
-            }
+                Contract = new UnitEatContract(this)
+            };
         }
         
+        var grass = Pathfinder.Fow(this)
+            .FirstOrDefault(x => x.Surface == Surface.Grass);
+
+        if (grass != null)
+        {
+            return new MoveUnitCommand($"{UnitType} {Name} found grass at {grass.X}:{grass.Y} and on it's way to it")
+            {
+                Contract = new MoveUnitContract(this, grass)
+            };
+        }
+
+        return StepOnRandomInFow();
+    }
+
+    private ICommand StepOnRandomInFow()
+    {
         var fowPoints = Pathfinder.Fow(this);
-        var filtered = fowPoints.Where(x => NodeAggregator.CanStepOnNode(x))
+        var filtered = fowPoints.Where(NodeAggregator.CanStepOnNode)
             .ToList();
 
-        if (!filtered.Any()) return null;
+        if (!filtered.Any())
+        {
+            return new RestUnitCommand(
+                $"{UnitType} {Name} hasn`t found grass or enemies in it's FOW at {Node.X}:{Node.Y} and decided to rest");
+        }
         
         var randIndex = new Random().Next(0, filtered.Count);
-
+        
         var randPoint = filtered[randIndex];
         
         return new MoveUnitCommand(

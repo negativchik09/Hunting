@@ -1,5 +1,6 @@
 ﻿using Hunting.BL.Enum;
 using Hunting.BL.Matrix;
+using Hunting.BL.Special;
 using Hunting.BL.Units;
 using Newtonsoft.Json;
 
