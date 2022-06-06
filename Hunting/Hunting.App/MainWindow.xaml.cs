@@ -28,6 +28,7 @@ namespace Hunting.App
         private BitmapImage rabbitImage;
         private BitmapImage wolfImage;
         private BitmapImage huntsmanImage;
+        private BitmapImage meatImage;
         private SolidColorBrush grassColor;
         private SolidColorBrush waterColor;
         private SolidColorBrush dirtColor;
@@ -118,6 +119,10 @@ namespace Hunting.App
             huntsmanImage.BeginInit();
             huntsmanImage.UriSource = new Uri(@"Assets/hunter.png", UriKind.Relative);
             huntsmanImage.EndInit();
+            meatImage = new BitmapImage();
+            meatImage.BeginInit();
+            meatImage.UriSource = new Uri(@"Assets/meat.png", UriKind.Relative);
+            meatImage.EndInit();
             grassColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#078b07");
             waterColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#064295");
             dirtColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#72493a");
@@ -165,6 +170,10 @@ namespace Hunting.App
                         break;
                     default:
                         break;
+                }
+                if (node.Meat.Count == 0)
+                {
+                    ((GameField.Children[node.Y * 40 + node.X] as Border).Child as Image).Source = meatImage;
                 }
                 if (node.Unit != null)
                 {
