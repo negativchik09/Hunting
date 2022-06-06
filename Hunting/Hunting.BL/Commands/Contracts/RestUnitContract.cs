@@ -2,7 +2,5 @@
 
 namespace Hunting.BL.Commands.Contracts;
 
-public class RestUnitContract : IContract
-{
-    public Unit Unit { get; set; }
-}
+public record RestUnitContract(Unit Unit) : IContract
+{ }

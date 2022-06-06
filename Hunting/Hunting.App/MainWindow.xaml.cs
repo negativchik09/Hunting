@@ -171,7 +171,7 @@ namespace Hunting.App
                     default:
                         break;
                 }
-                if (node.Meat.Count == 0)
+                if (node.Meat.Count > 0)
                 {
                     ((GameField.Children[node.Y * 40 + node.X] as Border).Child as Image).Source = meatImage;
                 }

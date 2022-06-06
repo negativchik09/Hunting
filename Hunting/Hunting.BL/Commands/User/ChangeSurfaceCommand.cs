@@ -29,7 +29,7 @@ public class ChangeSurfaceCommand : IUserCommand<ChangeSurfaceContract>
         _execute = contract =>
         {
             int surfaceIndex;
-            switch (contract.SurfaceType)
+            switch (contract.SurfaceType.Trim(' ', '\r', '\n'))
             {
                 case "Grass":
                     surfaceIndex = 0;

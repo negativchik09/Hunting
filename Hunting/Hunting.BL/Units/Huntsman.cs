@@ -90,6 +90,7 @@ public class Huntsman : Unit
             HungerRegen = 20,
             TurnsBeforeDispose = 3
         });
-        base.Die();
+        Node.Unit = null;
+        UnitIsHasCommandDict.Remove(this);
     }
 }

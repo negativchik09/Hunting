@@ -88,7 +88,10 @@ public class Rabbit : Unit
         if (!filtered.Any())
         {
             return new RestUnitCommand(
-                $"{UnitType} {Name} hasn`t found grass or enemies in it's FOW at {Node.X}:{Node.Y} and decided to rest");
+                $"{UnitType} {Name} hasn`t found grass or enemies in it's FOW at {Node.X}:{Node.Y} and decided to rest")
+            {
+                Contract = new RestUnitContract(this)
+            };
         }
         
         var randIndex = new Random().Next(0, filtered.Count);
@@ -110,8 +113,7 @@ public class Rabbit : Unit
             HungerRegen = 15,
             TurnsBeforeDispose = 5
         });
-        base.Die();
+        Node.Unit = null;
+        UnitIsHasCommandDict.Remove(this);
     }
-    
-    
 }

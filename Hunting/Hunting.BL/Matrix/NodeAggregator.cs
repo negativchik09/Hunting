@@ -44,7 +44,7 @@ internal static class NodeAggregator
         bool isNotOnLeftBorder = node.X - 1 >= 0;
         bool isNotOnRightBorder = node.X + 1 < MatrixSize;
         bool isNotOnTopBorder = node.Y - 1 >= 0;
-        bool isNotOnBotBorder = node.X - 1 < MatrixSize;
+        bool isNotOnBotBorder = node.Y + 1 < MatrixSize;
 
         if (isNotOnLeftBorder)
         {

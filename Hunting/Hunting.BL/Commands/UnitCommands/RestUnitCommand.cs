@@ -25,7 +25,7 @@ public class RestUnitCommand : IUnitCommand<RestUnitContract>
         _execute = contract =>
         {
             CommandUnit = contract.Unit;
-            CommandUnit.Hunger -= 1;
+            CommandUnit.Hunger -= 1; // TODO: Change to 1
             State = UnitCommandExecutionResult.Executed;
         };
     }

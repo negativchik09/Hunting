@@ -127,6 +127,7 @@ public class Wolf : Unit
             HungerRegen = 17,
             TurnsBeforeDispose = 4
         });
-        base.Die();
+        Node.Unit = null;
+        UnitIsHasCommandDict.Remove(this);
     }
 }

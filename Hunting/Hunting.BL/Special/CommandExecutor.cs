@@ -238,9 +238,18 @@ public class CommandExecutor
             
             yield return pair;
         }
-        
-        NodeAggregator.NodeList.SelectMany(x => x.Meat, (node, meat) => meat.TurnsBeforeDispose -= 1);
-        NodeAggregator.NodeList.Select(x => x.Meat.RemoveAll(meat => meat.TurnsBeforeDispose == 0));
+
+        foreach (var node in NodeAggregator.NodeList)
+        {
+            if (!node.Meat.Any()) break;
+            foreach (var meat in node.Meat)
+            {
+                meat.TurnsBeforeDispose -= 1;
+            }
+
+            node.Meat = node.Meat.Where(x => x.TurnsBeforeDispose > 0).ToList();
+        }
+
         foreach (var node in NodeAggregator.NodeList.Where(x =>
                      x.Surface == Surface.Ground && x.TurnsAfterGrassEating == 20))
         {
