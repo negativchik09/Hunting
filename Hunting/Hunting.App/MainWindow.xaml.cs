@@ -141,6 +141,7 @@ namespace Hunting.App
                     }
                 }
             }
+            LogTextBoxBase.ScrollToEnd();
 
             foreach (Node node in p.Nodes.ToList())
             {

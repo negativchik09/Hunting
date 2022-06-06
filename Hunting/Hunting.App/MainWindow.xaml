@@ -33,7 +33,7 @@
                     <RowDefinition/>
                     <RowDefinition Height="100"/>
                 </Grid.RowDefinitions>
-                <ScrollViewer>
+                <ScrollViewer x:Name="LogTextBoxBase">
                     <TextBox x:Name="LogTextBox"
                              IsReadOnly="True"
                              TextWrapping="Wrap"/>
