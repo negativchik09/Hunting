@@ -1,8 +1,10 @@
 ﻿using Hunting.BL.Abstractions;
 using Hunting.BL.Commands.Contracts;
 using Hunting.BL.Commands.UnitCommands;
+using Hunting.BL.Commands.User;
 using Hunting.BL.Enum;
 using Hunting.BL.Matrix;
+using Hunting.BL.Special;
 
 namespace Hunting.BL.Units;
 
@@ -113,7 +115,6 @@ public class Rabbit : Unit
             HungerRegen = 15,
             TurnsBeforeDispose = 5
         });
-        Node.Unit = null;
-        UnitIsHasCommandDict.Remove(this);
+        base.Die();
     }
 }

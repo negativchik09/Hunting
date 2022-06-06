@@ -17,7 +17,9 @@ public class Huntsman : Unit
             .Where(x => x.Meat.Count > 0);
         foreach (var node in nodes)
         {
-            Hunger += node.Meat.First().HungerRegen;
+            var meat = node.Meat.First();
+            Hunger += meat.HungerRegen;
+            node.Meat.Remove(meat);
             if (Hunger == 100)
             {
                 return;
@@ -90,7 +92,6 @@ public class Huntsman : Unit
             HungerRegen = 20,
             TurnsBeforeDispose = 3
         });
-        Node.Unit = null;
-        UnitIsHasCommandDict.Remove(this);
+        base.Die();
     }
 }

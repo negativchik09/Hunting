@@ -17,7 +17,9 @@ public class Wolf : Unit
             .Where(x => x.Meat.Count > 0);
         foreach (var node in nodes)
         {
-            Hunger += node.Meat.First().HungerRegen;
+            var meat = node.Meat.First();
+            Hunger += meat.HungerRegen;
+            node.Meat.Remove(meat);
             if (Hunger == 40)
             {
                 return;
@@ -127,7 +129,6 @@ public class Wolf : Unit
             HungerRegen = 17,
             TurnsBeforeDispose = 4
         });
-        Node.Unit = null;
-        UnitIsHasCommandDict.Remove(this);
+        base.Die();
     }
 }

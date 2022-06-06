@@ -1,4 +1,6 @@
-﻿using Hunting.BL.Enum;
+﻿using Hunting.BL.Commands.Contracts;
+using Hunting.BL.Commands.User;
+using Hunting.BL.Enum;
 using Hunting.BL.Matrix;
 using Hunting.BL.Special;
 using Hunting.BL.Units;
@@ -85,7 +87,14 @@ public abstract class Unit : IEquatable<Unit>
         Hunger -= 100; // TODO: Change to 1
     }
 
-    public abstract void Die();
+    public virtual void Die()
+    {
+        CommandExecutor.Instance.AddCommand(new RemoveUnitCommand($"{UnitType} {Name} died at {Node.X}:{Node.Y}")
+        {
+            Contract = new RemoveUnitContract(X, Y),
+            State = UserCommandExecutionResult.Valid
+        });
+    }
 
     public abstract void Eat();
 
