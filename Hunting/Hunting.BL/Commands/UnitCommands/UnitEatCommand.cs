@@ -25,6 +25,7 @@ internal class UnitEatCommand : IUnitCommand<UnitEatContract>
             if (!_canExecute(contract)) return;
             Unit = contract.unit;
             contract.unit.Eat();
+            State = UnitCommandExecutionResult.Executed;
         };
     }
 
