@@ -93,6 +93,7 @@ public class CommandExecutor
                         case UnitCommandExecutionResult.Executing:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
                             continueList.Add(unitCommand);
+                            Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = true;
                             break;
                         case UnitCommandExecutionResult.Executed:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
@@ -125,6 +126,7 @@ public class CommandExecutor
                         case UnitCommandExecutionResult.Executing:
                             continueList.Add(unitCommand);
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
+                            Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = true;
                             break;
                         case UnitCommandExecutionResult.Executed:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
@@ -163,6 +165,7 @@ public class CommandExecutor
                         case UnitCommandExecutionResult.Executing:
                             continueList.Add(unitCommand);
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
+                            Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = true;
                             break;
                         case UnitCommandExecutionResult.Executed:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
@@ -196,6 +199,7 @@ public class CommandExecutor
                         case UnitCommandExecutionResult.Executing:
                             continueList.Add(unitCommand);
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
+                            Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = true;
                             break;
                         case UnitCommandExecutionResult.Executed:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);

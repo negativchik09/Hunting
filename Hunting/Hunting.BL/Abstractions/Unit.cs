@@ -82,7 +82,7 @@ public abstract class Unit : IEquatable<Unit>
         Node.Unit = null;
         node.Unit = this;
         Node = node;
-        Hunger -= 1;
+        Hunger -= 10; // TODO: Change to 1
     }
 
     public virtual void Die()

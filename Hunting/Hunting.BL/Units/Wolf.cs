@@ -8,7 +8,7 @@ namespace Hunting.BL.Units;
 
 public class Wolf : Unit
 { 
-    internal Wolf(string name, Node? node) : base(50, name, 40, node, nameof(Wolf), 360, 7)
+    internal Wolf(string name, Node? node) : base(50, name, 40, node, nameof(Wolf), 360, 5)
     { }
 
     public override void Eat()
@@ -75,7 +75,7 @@ public class Wolf : Unit
                 };
             }
 
-            var meat = Pathfinder.Fow(this).FirstOrDefault(x => x.Meat.Count == 0);
+            var meat = Pathfinder.Fow(this).FirstOrDefault(x => x.Meat.Count != 0);
             
             if (meat != null)
             {
@@ -88,7 +88,7 @@ public class Wolf : Unit
 
         if (prey != null)
         {
-            if (NodeAggregator.NeighbouringNodes(Node, NeighbourType.Diagonal).Where(NodeAggregator.CanStepOnNode).Contains(prey.Node))
+            if (NodeAggregator.NeighbouringNodes(Node, NeighbourType.Diagonal).Contains(prey.Node))
             {
                 return new UnitAttackCommand($"{UnitType} {Name} attacks its prey {prey.UnitType} {prey.Name} at {prey.Node.X}:{prey.Node.Y}")
                 {

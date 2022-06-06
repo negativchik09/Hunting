@@ -10,9 +10,7 @@ internal static class Pathfinder
     {
         IEnumerable<Node> nodes = NodeAggregator.Segment(
             unit.Node,
-            unit.Direction,
-            unit.VisibilityRange,
-            unit.VisibilityAngle);
+            unit.VisibilityRange);
 
         var start = unit.Node;
         var resultList = new HashSet<Node>();
@@ -99,7 +97,7 @@ internal static class Pathfinder
 
     public static MovingPathFindResult FindPath(Unit unit, Node node)
     {
-        var result = FindWay(unit.Node, node);
+        var result = FindWay(unit.Node, node, unit.VisibilityRange);
         var steps = () =>
         {
             Queue<Node> nodes = new Queue<Node>();
@@ -119,13 +117,13 @@ internal static class Pathfinder
         };
     }
     
-    private static Stack<Node>? FindWay(Node start, Node end)
+    private static Stack<Node>? FindWay(Node start, Node end, int range)
     {
         if (!NodeAggregator.CanStepOnNode(end))
         {
             return null;
         }
-        var distanceDict = NodeAggregator.Nodes
+        var distanceDict = NodeAggregator.Segment(start, range)
             .Where(NodeAggregator.CanStepOnNode)
             .ToDictionary(x => x, x => -1);
         SetDistances(start, distanceDict);
@@ -150,7 +148,7 @@ internal static class Pathfinder
     {
         var list = new List<Node>() { start };
         var visited = new List<Node>();
-        for (var i = 0; list.Count > 0 && i < 5; i++)
+        for (var i = 0; list.Count > 0 && i < 11; i++)
         {
             foreach (var node in list)
             {

@@ -121,7 +121,7 @@ internal static class NodeAggregator
         }
     }
 
-    public static IEnumerable<Node> Segment(Node? node, Direction direction, int range, double segmentRadians)
+    public static IEnumerable<Node> Segment(Node? node, int range)
     {
         List<Node> nodes = new List<Node>() { node };
 
