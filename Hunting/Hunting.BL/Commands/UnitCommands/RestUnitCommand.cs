@@ -1,9 +1,6 @@
 ﻿using Hunting.BL.Abstractions;
 using Hunting.BL.Commands.Contracts;
 using Hunting.BL.Enum;
-using Hunting.BL.Matrix;
-using Hunting.BL.Special;
-using Hunting.BL.Units;
 
 namespace Hunting.BL.Commands.UnitCommands;
 

@@ -1,8 +1,10 @@
-﻿using Hunting.BL.Abstractions;
+﻿using System.Diagnostics;
+using Hunting.BL.Abstractions;
 using Hunting.BL.Commands.User;
 using Hunting.BL.Commands.UnitCommands;
 using Hunting.BL.Enum;
 using Hunting.BL.Matrix;
+using Newtonsoft.Json;
 
 namespace Hunting.BL.Special;
 
@@ -270,6 +272,7 @@ public class CommandExecutor
             return;
         }
         _queue.Enqueue(command, GetPriority(command)); // lowest first
+        Console.WriteLine(command.CommandText + " Is added");
     }
 
     private int GetPriority(ICommand command)
