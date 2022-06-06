@@ -18,13 +18,13 @@ public class MoveUnitCommand : IUnitCommand<MoveUnitContract>
         CommandText = commandText;
         _canExecute = contract =>
         {
-            CommandUnit = contract.unit;
-            if (!Unit.Units.Contains(contract.unit))
+            CommandUnit = contract.Unit;
+            if (!Unit.Units.Contains(contract.Unit))
             {
                 State = UnitCommandExecutionResult.UnableExecute;
                 return false;
             }
-            MovingPathfindRes = Pathfinder.FindPath(contract.unit, contract.endNode);
+            MovingPathfindRes = Pathfinder.FindPath(contract.Unit.Node, contract.EndNode, contract.Unit.VisibilityRange);
             if (MovingPathfindRes.CanMove) return MovingPathfindRes.CanMove;
             State = UnitCommandExecutionResult.UnableExecute;
             return MovingPathfindRes.CanMove;
@@ -32,19 +32,12 @@ public class MoveUnitCommand : IUnitCommand<MoveUnitContract>
         _execute = contract =>
         {
             if (!_canExecute(contract)) return;
-            CommandUnit = contract.unit;
-            int numberOfSteps = contract.unit.UnitType switch
-            {
-                nameof(Wolf) => 3,
-                nameof(Rabbit) => 2,
-                nameof(Huntsman) => 2,
-                _ => throw new ArgumentException(
-                    $"{contract.unit.UnitType} is not valid unit type", contract.unit.UnitType, null)
-            };
+            CommandUnit = contract.Unit;
+            int numberOfSteps = contract.Unit.NodesPerTurn;
             for (int i = 0; i< numberOfSteps; i++)
             {
-                contract.unit.Step(MovingPathfindRes.Steps.Dequeue());
-                if (contract.unit.Node == contract.endNode)
+                contract.Unit.Step(MovingPathfindRes.Steps.Dequeue());
+                if (contract.Unit.Node == contract.EndNode || !Unit.Units.Contains(contract.Unit))
                 {
                     State = UnitCommandExecutionResult.Executed;
                     return;

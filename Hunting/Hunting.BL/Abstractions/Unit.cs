@@ -1,4 +1,5 @@
 ﻿using Hunting.BL.Commands.Contracts;
+using Hunting.BL.Commands.UnitCommands;
 using Hunting.BL.Commands.User;
 using Hunting.BL.Enum;
 using Hunting.BL.Matrix;
@@ -12,11 +13,11 @@ public abstract class Unit : IEquatable<Unit>
 {
     private int _hunger;
     private double _hp;
-    public static IEnumerable<Unit> Units => UnitIsHasCommandDict.Keys;
-    public static Dictionary<Unit, bool> UnitIsHasCommandDict { get; } = new();
+    [JsonIgnore] public static IEnumerable<Unit> Units => UnitIsHasCommandDict.Keys;
+    [JsonIgnore] public static Dictionary<Unit, bool> UnitIsHasCommandDict { get; } = new();
     public string UnitType { get; init; }
 
-    public int NodesPerTurn => UnitType switch
+    [JsonIgnore] public int NodesPerTurn => UnitType switch
     {
         nameof(Wolf) => 3,
         nameof(Rabbit) => 2,
@@ -56,13 +57,13 @@ public abstract class Unit : IEquatable<Unit>
         }
     }
 
-    public int VisibilityRange { get; init; }
-    public double VisibilityAngle { get; init; }
-    public Direction Direction { get; private set; }
+    [JsonIgnore] public int VisibilityRange { get; init; }
+    [JsonIgnore] public double VisibilityAngle { get; init; }
+    [JsonIgnore] public Direction Direction { get; private set; }
     [JsonIgnore] public Node Node { get; internal set; }
-    [JsonIgnore] public int X => Node.X;
+    public int X => Node.X;
 
-    [JsonIgnore] public int Y => Node.Y;
+    public int Y => Node.Y;
 
     protected Unit(double hp, string name, int hunger, Node node, string unitType, double visibilityAngle, int visibilityRange)
     {
@@ -84,7 +85,7 @@ public abstract class Unit : IEquatable<Unit>
         Node.Unit = null;
         node.Unit = this;
         Node = node;
-        Hunger -= 100; // TODO: Change to 1
+        Hunger -= 2;
     }
 
     public virtual void Die()
@@ -123,5 +124,30 @@ public abstract class Unit : IEquatable<Unit>
         {
             return (UnitType.GetHashCode() * 397) ^ Name.GetHashCode();
         }
+    }
+    
+    protected ICommand StepOnRandomInFow(IEnumerable<Node> fowPoints)
+    {
+        var filtered = fowPoints.Where(NodeAggregator.CanStepOnNode)
+            .ToList();
+
+        if (!filtered.Any())
+        {
+            return new RestUnitCommand(
+                $"{UnitType} {Name} hasn`t found grass or enemies in it's FOW at {Node.X}:{Node.Y} and decided to rest")
+            {
+                Contract = new RestUnitContract(this)
+            };
+        }
+        
+        var randIndex = new Random().Next(0, filtered.Count);
+        
+        var randPoint = Pathfinder.FindNearestNode(Node, filtered[randIndex], NodesPerTurn);
+
+        return new MoveUnitCommand(
+            $"{UnitType} {Name} hasn`t found grass or enemies in it's FOW at {Node.X}:{Node.Y} and moved to {randPoint.X}:{randPoint.Y}")
+        {
+            Contract = new MoveUnitContract(this, randPoint)
+        };
     }
 }

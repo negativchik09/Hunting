@@ -2,4 +2,4 @@
 
 namespace Hunting.BL.Commands.Contracts;
 
-public record UnitAttackContract(Unit attackingUnit, Unit attackedUnit) : IContract;
+public record UnitAttackContract(Unit AttackingUnit, Unit AttackedUnit) : IContract;

@@ -35,7 +35,9 @@ public class Huntsman : Unit
 
     public override ICommand GetNextCommand()
     {
-        if (Hunger < 20)
+        var fow = Pathfinder.Fow(this).ToList();
+        
+        if (Hunger < 50)
         {
             if (CanEat())
             {
@@ -45,7 +47,7 @@ public class Huntsman : Unit
                 };
             }
 
-            var meat = Pathfinder.Fow(this).FirstOrDefault(x => x.Meat.Count == 0);
+            var meat = fow.FirstOrDefault(x => x.Meat.Count == 0);
 
             if (meat != null)
             {
@@ -56,7 +58,7 @@ public class Huntsman : Unit
             }
         }
 
-        var prey = Pathfinder.Fow(this)
+        var prey = fow
            .FirstOrDefault(x => x.Unit != null && x.Unit.UnitType != nameof(Huntsman))?.Unit;
 
         if (prey != null)
@@ -67,21 +69,7 @@ public class Huntsman : Unit
             };
         }
 
-        var fowPoints = Pathfinder.Fow(this)
-            .Where(NodeAggregator.CanStepOnNode)
-            .ToList();
-
-        if (!fowPoints.Any()) return null;
-        
-        var randIndex = new Random().Next(0, fowPoints.Count);
-
-        var randPoint = fowPoints[randIndex];
-
-        return new MoveUnitCommand(
-            $"{UnitType} {Name} hasn`t found meat or prey in it's FOW at {Node.X}:{Node.Y} and moving to {randPoint.X}:{randPoint.Y}")
-        {
-            Contract = new MoveUnitContract(this, randPoint)
-        };
+        return StepOnRandomInFow(fow);
     }
 
     public override void Die()
@@ -89,8 +77,8 @@ public class Huntsman : Unit
         Node.Meat.Add(new Meat()
         {
             Amount = 4,
-            HungerRegen = 20,
-            TurnsBeforeDispose = 3
+            HungerRegen = 100,
+            TurnsBeforeDispose = 10
         });
         base.Die();
     }

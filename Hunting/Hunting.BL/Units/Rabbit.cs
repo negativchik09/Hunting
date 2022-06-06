@@ -10,7 +10,7 @@ namespace Hunting.BL.Units;
 
 public class Rabbit : Unit
 {
-    internal Rabbit(string name, Node? node) : base(20, name, 20, node, nameof(Rabbit), 360, 3)
+    internal Rabbit(string name, Node? node) : base(20, name, 20, node, nameof(Rabbit), 360, 4)
     { }
 
     public override void Eat()
@@ -27,8 +27,8 @@ public class Rabbit : Unit
 
     public override ICommand GetNextCommand()
     {
-        UnitIsHasCommandDict[this] = true;
-        var enemy = Pathfinder.Fow(this)
+        var canStep = Pathfinder.Fow(this).ToList();
+        var enemy = canStep
             .FirstOrDefault(x => x.Unit != null && x.Unit.UnitType != nameof(Rabbit))?.Unit;
         
         if (enemy != null)
@@ -48,7 +48,7 @@ public class Rabbit : Unit
 
             if (target == null)
             {
-                return StepOnRandomInFow();
+                return StepOnRandomInFow(canStep);
             }
 
             return new MoveUnitCommand($"{UnitType} {Name} tried to escape from enemy to {target.X}:{target.Y}")
@@ -57,7 +57,7 @@ public class Rabbit : Unit
             };
         }
 
-        if (Hunger >= 10) return StepOnRandomInFow();
+        if (Hunger >= 10) return StepOnRandomInFow(canStep);
         
         if (CanEat())
         {
@@ -67,7 +67,7 @@ public class Rabbit : Unit
             };
         }
         
-        var grass = Pathfinder.Fow(this)
+        var grass = canStep
             .FirstOrDefault(x => x.Surface == Surface.Grass);
 
         if (grass != null)
@@ -78,33 +78,7 @@ public class Rabbit : Unit
             };
         }
 
-        return StepOnRandomInFow();
-    }
-
-    private ICommand StepOnRandomInFow()
-    {
-        var fowPoints = Pathfinder.Fow(this);
-        var filtered = fowPoints.Where(NodeAggregator.CanStepOnNode)
-            .ToList();
-
-        if (!filtered.Any())
-        {
-            return new RestUnitCommand(
-                $"{UnitType} {Name} hasn`t found grass or enemies in it's FOW at {Node.X}:{Node.Y} and decided to rest")
-            {
-                Contract = new RestUnitContract(this)
-            };
-        }
-        
-        var randIndex = new Random().Next(0, filtered.Count);
-        
-        var randPoint = filtered[randIndex];
-        
-        return new MoveUnitCommand(
-            $"{UnitType} {Name} hasn`t found grass or enemies in it's FOW at {Node.X}:{Node.Y} and moving to {randPoint.X}:{randPoint.Y}")
-        {
-            Contract = new MoveUnitContract(this, randPoint)
-        };
+        return StepOnRandomInFow(canStep);
     }
 
     public override void Die()
@@ -112,8 +86,8 @@ public class Rabbit : Unit
         Node.Meat.Add(new Meat()
         {
             Amount = 1,
-            HungerRegen = 15,
-            TurnsBeforeDispose = 5
+            HungerRegen = 80,
+            TurnsBeforeDispose = 15
         });
         base.Die();
     }

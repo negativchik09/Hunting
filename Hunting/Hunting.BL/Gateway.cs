@@ -15,12 +15,15 @@ public class Gateway
     {
         _timer = new Timer();
         _timer.AutoReset = true;
-        _timer.Elapsed += (sender, args) => ExecuteOneTurn();
+        _timer.Elapsed += async (sender, args) =>
+        {
+            await ExecuteOneTurn();
+        };
     }
 
     public IEnumerable<Node> Nodes => NodeAggregator.Nodes;
 
-    public void ExecuteOneTurn()
+    public async Task ExecuteOneTurn()
     {
         var pairs = CommandExecutor.Instance.MakeOneTurn().ToList();
         var dict = new Dictionary<string, bool>(

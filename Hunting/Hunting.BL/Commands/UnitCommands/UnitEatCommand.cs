@@ -17,16 +17,16 @@ internal class UnitEatCommand : IUnitCommand<UnitEatContract>
 
         _canExecute = contract =>
         {
-            CommandUnit = contract.unit;
-            if (Unit.Units.Contains(contract.unit)) return contract.unit.CanEat();
+            CommandUnit = contract.Unit;
+            if (Unit.Units.Contains(contract.Unit)) return contract.Unit.CanEat();
             State = UnitCommandExecutionResult.UnableExecute;
             return false;
         };
         _execute = contract =>
         {
             if (!_canExecute(contract)) return;
-            CommandUnit = contract.unit;
-            contract.unit.Eat();
+            CommandUnit = contract.Unit;
+            contract.Unit.Eat();
             State = UnitCommandExecutionResult.Executed;
         };
     }

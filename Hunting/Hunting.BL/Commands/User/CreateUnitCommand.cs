@@ -64,7 +64,7 @@ public class CreateUnitCommand : IUserCommand<CreateUnitContract>
                 nameof(Rabbit) => new Rabbit(contract.UnitName, node),
                 nameof(Huntsman) => new Huntsman(contract.UnitName, node),
                 _ => throw new ArgumentException(
-                    $"{contract.UnitType} is not valid unit type", contract.UnitType, null)
+                    $"{contract.UnitType} is not valid Unit type", contract.UnitType, null)
             };
             node.Unit = unit;
             State = UserCommandExecutionResult.Executed;

@@ -8,7 +8,7 @@ namespace Hunting.BL.Units;
 
 public class Wolf : Unit
 { 
-    internal Wolf(string name, Node? node) : base(50, name, 40, node, nameof(Wolf), 360, 5)
+    internal Wolf(string name, Node? node) : base(50, name, 200, node, nameof(Wolf), 360, 5)
     { }
 
     public override void Eat()
@@ -35,19 +35,23 @@ public class Wolf : Unit
 
     public override ICommand GetNextCommand()
     {
-        var prey = Pathfinder.Fow(this)
-           .FirstOrDefault(x => x.Unit != null && x.Unit.UnitType == nameof(Rabbit))?.Unit;
+        var fow = Pathfinder.Fow(this).ToList();
+        var prey = fow
+           .FirstOrDefault(x => x.Unit is { UnitType: nameof(Rabbit) })?.Unit
+            ?? NodeAggregator.NeighbouringNodes(Node, NeighbourType.Diagonal)
+            .FirstOrDefault(x => x.Unit is { UnitType: nameof(Rabbit) })?.Unit;
 
-        var enemy = Pathfinder.Fow(this)
-            .FirstOrDefault(x => x.Unit != null && x.Unit.UnitType == nameof(Huntsman))?.Unit;
+        var enemy = fow
+            .FirstOrDefault(x => x.Unit is { UnitType: nameof(Huntsman) })?.Unit;
 
+        Node? target = null;
+        
         if (enemy != null)
         {
             var nodes = NodeAggregator.VectorFromNode(
                 Node,
                 Pathfinder.OppositeDirectionByNodes(Node, enemy.Node))
                 .Take(NodesPerTurn);
-            Node target = null;
             foreach (var node in nodes)
             {
                 if (NodeAggregator.CanStepOnNode(node))
@@ -58,7 +62,7 @@ public class Wolf : Unit
 
             if (target == null)
             {
-                return null;
+                return StepOnRandomInFow(fow);;
             }
 
             return new MoveUnitCommand($"{UnitType} {Name} tried to escape from enemy to {target.X}:{target.Y}")
@@ -67,7 +71,7 @@ public class Wolf : Unit
             };
         }
 
-        if (Hunger < 20)
+        if (Hunger < 100)
         {
             if (CanEat())
             {
@@ -77,7 +81,7 @@ public class Wolf : Unit
                 };
             }
 
-            var meat = Pathfinder.Fow(this).FirstOrDefault(x => x.Meat.Count != 0);
+            var meat = fow.FirstOrDefault(x => x.Meat.Count != 0);
             
             if (meat != null)
             {
@@ -88,37 +92,25 @@ public class Wolf : Unit
             }
         }
 
-        if (prey != null)
+        if (prey == null) return StepOnRandomInFow(fow);
+        
+        if (NodeAggregator.NeighbouringNodes(Node, NeighbourType.Diagonal).Contains(prey.Node))
         {
-            if (NodeAggregator.NeighbouringNodes(Node, NeighbourType.Diagonal).Contains(prey.Node))
+            return new UnitAttackCommand($"{UnitType} {Name} attacks its prey {prey.UnitType} {prey.Name} at {prey.Node.X}:{prey.Node.Y}")
             {
-                return new UnitAttackCommand($"{UnitType} {Name} attacks its prey {prey.UnitType} {prey.Name} at {prey.Node.X}:{prey.Node.Y}")
-                {
-                    Contract = new UnitAttackContract(this, prey)
-                };
-            }
-            Node target = NodeAggregator.NeighbouringNodes(Node, NeighbourType.Diagonal).Where(NodeAggregator.CanStepOnNode).First();
-            return new MoveUnitCommand($"{UnitType} {Name} follows its prey {prey.UnitType} {prey.Name} to {target.X}:{target.Y}")
-            {
-                Contract = new MoveUnitContract(this, target)
+                Contract = new UnitAttackContract(this, prey)
             };
         }
-
-        var fowPoints = Pathfinder.Fow(this)
-            .Where(NodeAggregator.CanStepOnNode)
-            .ToList();
         
-        if (!fowPoints.Any()) return null;
+        //target = NodeAggregator.NeighbouringNodes(prey.Node, NeighbourType.Diagonal).Where(NodeAggregator.CanStepOnNode).First();
 
-        var randIndex = new Random().Next(0, fowPoints.Count);
+        target = Pathfinder.FindNearestNode(Node, prey.Node, NodesPerTurn);
 
-        var randPoint = fowPoints[randIndex];
-
-        return new MoveUnitCommand(
-            $"{UnitType} {Name} hasn`t found meat or enemies in it's FOW at {Node.X}:{Node.Y} and moving to {randPoint.X}:{randPoint.Y}")
+        return new MoveUnitCommand($"{UnitType} {Name} follows its prey {prey.UnitType} {prey.Name} to {target.X}:{target.Y}")
         {
-            Contract = new MoveUnitContract(this, randPoint)
+            Contract = new MoveUnitContract(this, target)
         };
+
     }
 
     public override void Die()
@@ -127,7 +119,7 @@ public class Wolf : Unit
         {
             Amount = 2,
             HungerRegen = 17,
-            TurnsBeforeDispose = 4
+            TurnsBeforeDispose = 12
         });
         base.Die();
     }

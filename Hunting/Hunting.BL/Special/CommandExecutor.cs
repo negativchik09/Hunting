@@ -25,11 +25,14 @@ public class CommandExecutor
     {
         TurnNumber = 0;
         _queue = new PriorityQueue<ICommand, int>();
+        _continueList = new List<ICommand>();
     }
 
     public int TurnNumber { get; private set; }
 
     private PriorityQueue<ICommand, int> _queue;
+
+    private List<ICommand> _continueList;
 
     public IEnumerable<KeyValuePair<string, bool>> MakeOneTurn()
     {
@@ -40,7 +43,25 @@ public class CommandExecutor
             x.TurnsAfterGrassEating += 1;
         }
 
-        var continueList = new List<ICommand>();
+        var units = Unit.UnitIsHasCommandDict.Keys;
+
+        var unitsWithoutCommand = units.Where(unit => !Unit.UnitIsHasCommandDict[unit]).ToList();
+
+        var commandsFromUnits = unitsWithoutCommand.Select(unit => unit.GetNextCommand());
+            
+        _continueList.AddRange(commandsFromUnits);
+
+        foreach (var unit in unitsWithoutCommand)
+        {
+            Unit.UnitIsHasCommandDict[unit] = true;
+        }
+        
+        foreach (var continueCommand in _continueList)
+        {
+            AddCommand(continueCommand);
+        }
+        
+        _continueList.Clear();
         
         while (_queue.Count > 0)
         {
@@ -94,7 +115,7 @@ public class CommandExecutor
                     {
                         case UnitCommandExecutionResult.Executing:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
-                            continueList.Add(unitCommand);
+                            _continueList.Add(unitCommand);
                             Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = true;
                             break;
                         case UnitCommandExecutionResult.Executed:
@@ -126,7 +147,7 @@ public class CommandExecutor
                     switch (unitCommand?.State)
                     {
                         case UnitCommandExecutionResult.Executing:
-                            continueList.Add(unitCommand);
+                            _continueList.Add(unitCommand);
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
                             Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = true;
                             break;
@@ -136,13 +157,13 @@ public class CommandExecutor
                             break;
                         case UnitCommandExecutionResult.UnableExecute:
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, false);
-                            if (Unit.Units.Contains(unitCommand.Contract.attackedUnit))
+                            if (Unit.Units.Contains(unitCommand.Contract.AttackedUnit))
                             {
-                                Unit.UnitIsHasCommandDict[unitCommand.Contract.attackedUnit] = false;
+                                Unit.UnitIsHasCommandDict[unitCommand.Contract.AttackedUnit] = false;
                             }
-                            if (Unit.Units.Contains(unitCommand.Contract.attackingUnit))
+                            if (Unit.Units.Contains(unitCommand.Contract.AttackingUnit))
                             {
-                                Unit.UnitIsHasCommandDict[unitCommand.Contract.attackingUnit] = false;
+                                Unit.UnitIsHasCommandDict[unitCommand.Contract.AttackingUnit] = false;
                             }
                             break;
                         case UnitCommandExecutionResult.None:
@@ -165,7 +186,7 @@ public class CommandExecutor
                     switch (unitCommand?.State)
                     {
                         case UnitCommandExecutionResult.Executing:
-                            continueList.Add(unitCommand);
+                            _continueList.Add(unitCommand);
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
                             Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = true;
                             break;
@@ -199,7 +220,7 @@ public class CommandExecutor
                     switch (unitCommand?.State)
                     {
                         case UnitCommandExecutionResult.Executing:
-                            continueList.Add(unitCommand);
+                            _continueList.Add(unitCommand);
                             pair = new KeyValuePair<string, bool>(unitCommand.CommandText, true);
                             Unit.UnitIsHasCommandDict[unitCommand.CommandUnit] = true;
                             break;
@@ -225,14 +246,6 @@ public class CommandExecutor
                 }
             }
 
-            var units = Unit.UnitIsHasCommandDict.Keys;
-
-            var unitsWithoutCommand = units.Where(unit => !Unit.UnitIsHasCommandDict[unit]);
-
-            var commandsFromUnits = unitsWithoutCommand.Select(unit => unit.GetNextCommand());
-            
-            continueList.AddRange(commandsFromUnits);
-            
             if (pair.Key == null)
             {
                 yield break;
@@ -243,7 +256,7 @@ public class CommandExecutor
 
         foreach (var node in NodeAggregator.NodeList)
         {
-            if (!node.Meat.Any()) break;
+            if (!node.Meat.Any()) continue;
             foreach (var meat in node.Meat)
             {
                 meat.TurnsBeforeDispose -= 1;
@@ -257,11 +270,6 @@ public class CommandExecutor
         {
             node.TurnsAfterGrassEating = -1;
             node.Surface = Surface.Grass;
-        }
-        
-        foreach (var continueCommand in continueList)
-        {
-            AddCommand(continueCommand);
         }
     }
 

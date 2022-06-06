@@ -8,9 +8,9 @@ internal static class Pathfinder
 {
     public static IEnumerable<Node> Fow(Unit unit)
     {
-        IEnumerable<Node> nodes = NodeAggregator.Segment(
+        var nodes = NodeAggregator.Segment(
             unit.Node,
-            unit.VisibilityRange);
+            unit.VisibilityRange).ToList();
 
         var start = unit.Node;
         var resultList = new HashSet<Node>();
@@ -89,15 +89,12 @@ internal static class Pathfinder
     
     private static void EnqueueIfNotNull(Node? node, Queue<Node> queue)
     {
-        if (node != null)
-        {
-            queue.Enqueue(node);
-        }
+        if (node != null && !queue.Contains(node)) queue.Enqueue(node);
     }
 
-    public static MovingPathFindResult FindPath(Unit unit, Node node)
+    public static MovingPathFindResult FindPath(Node unitNode, Node targetNode, int range)
     {
-        var result = FindWay(unit.Node, node, unit.VisibilityRange);
+        var result = FindWay(unitNode, targetNode, range);
         var steps = () =>
         {
             Queue<Node> nodes = new Queue<Node>();
@@ -157,7 +154,7 @@ internal static class Pathfinder
             }
 
             IEnumerable<Node> nodes = list
-                .Select(node => NodeAggregator.NeighbouringNodes(node, NeighbourType.Side)
+                .Select(node => NodeAggregator.NeighbouringNodes(node, NeighbourType.Side, dictionary.Keys)
                     .Where(NodeAggregator.CanStepOnNode)
                     .Except(visited))
                 .Aggregate((x, y) => x.Concat(y));
@@ -165,5 +162,14 @@ internal static class Pathfinder
             list.Clear();
             list.AddRange(nodes);
         }
+    }
+
+    public static Node FindNearestNode(Node startNode, Node targetNode, int range)
+    {
+        var segment = NodeAggregator.Segment(startNode, range, NeighbourType.Side)
+            .Where(NodeAggregator.CanStepOnNode)
+            .ToList();
+        
+        return segment.MinBy(node => Math.Abs(node.X - targetNode.X) + Math.Abs(node.Y - targetNode.Y))!;
     }
 }

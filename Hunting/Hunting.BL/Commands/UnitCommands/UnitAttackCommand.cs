@@ -17,46 +17,48 @@ internal class UnitAttackCommand : IUnitCommand<UnitAttackContract>
 
         _canExecute = contract =>
         {
-            CommandUnit = contract.attackingUnit;
-            if (!Unit.Units.Contains(contract.attackingUnit))
+            CommandUnit = contract.AttackingUnit;
+            if (!Unit.Units.Contains(contract.AttackingUnit))
             {
                 State = UnitCommandExecutionResult.UnableExecute;
                 return false;
             }
-            if (!Unit.Units.Contains(contract.attackedUnit))
+            if (!Unit.Units.Contains(contract.AttackedUnit))
             {
                 State = UnitCommandExecutionResult.UnableExecute;
                 return false;
             }
-            switch (contract.attackingUnit.UnitType)
+            switch (contract.AttackingUnit.UnitType)
             {
                 case nameof(Wolf):
-                    return NodeAggregator.IsNeighbouring(contract.attackingUnit.Node, contract.attackedUnit.Node, NeighbourType.Diagonal);
+                    return NodeAggregator.IsNeighbouring(contract.AttackingUnit.Node, contract.AttackedUnit.Node, NeighbourType.Diagonal);
                 case nameof(Huntsman):
-                    return Pathfinder.Fow(contract.attackingUnit).Contains(contract.attackedUnit.Node);
+                    return Pathfinder.Fow(contract.AttackingUnit).Contains(contract.AttackedUnit.Node);
                 default:
                     throw new ArgumentException(
-                    $"{contract.attackingUnit.UnitType} is not valid unit type", contract.attackingUnit.UnitType, null);
+                    $"{contract.AttackingUnit.UnitType} is not valid Unit type", contract.AttackingUnit.UnitType, null);
             }
         };
         
         _execute = contract =>
         {
             if (!_canExecute(contract)) return;
-            CommandUnit = contract.attackingUnit;
-            switch (contract.attackingUnit.UnitType)
+            CommandUnit = contract.AttackingUnit;
+            contract.AttackingUnit.Hunger -= 5;
+            switch (contract.AttackingUnit.UnitType)
             {
                 case nameof(Wolf):
-                    contract.attackedUnit.Hp -= 15;
+                    contract.AttackedUnit.Hp -= 15;
+                    contract.AttackedUnit.Hunger /= 2;
                     State = UnitCommandExecutionResult.Executed;
                     return;
                 case nameof(Huntsman):
-                    contract.attackedUnit.Hp -= 999;
+                    contract.AttackedUnit.Hp -= 999;
                     State = UnitCommandExecutionResult.Executed;
                     return;
                 default:
                     throw new ArgumentException(
-                    $"{contract.attackingUnit.UnitType} is not valid unit type", contract.attackingUnit.UnitType, null);
+                    $"{contract.AttackingUnit.UnitType} is not valid Unit type", contract.AttackingUnit.UnitType, null);
             }
         };
     }

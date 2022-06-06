@@ -41,6 +41,11 @@ internal static class NodeAggregator
 
     public static IEnumerable<Node> NeighbouringNodes(Node node, NeighbourType type)
     {
+        return NeighbouringNodes(node, type, NodeList);
+    }
+
+    public static IEnumerable<Node> NeighbouringNodes(Node node, NeighbourType type, IEnumerable<Node> nodes)
+    {
         bool isNotOnLeftBorder = node.X - 1 >= 0;
         bool isNotOnRightBorder = node.X + 1 < MatrixSize;
         bool isNotOnTopBorder = node.Y - 1 >= 0;
@@ -48,38 +53,38 @@ internal static class NodeAggregator
 
         if (isNotOnLeftBorder)
         {
-            yield return _nodes[node.X - 1, node.Y];
+            yield return GetNode(node.X - 1, node.Y);
         }
         if (isNotOnRightBorder)
         {
-            yield return _nodes[node.X + 1, node.Y];
+            yield return GetNode(node.X + 1, node.Y);
         }
         if (isNotOnTopBorder)
         {
-            yield return _nodes[node.X, node.Y - 1];
+            yield return GetNode(node.X, node.Y - 1);
         }
         if (isNotOnBotBorder)
         {
-            yield return _nodes[node.X, node.Y + 1];
+            yield return GetNode(node.X, node.Y + 1);
         }
 
         if (type == NeighbourType.Side) yield break;
         
         if (isNotOnTopBorder && isNotOnLeftBorder)
         {
-            yield return _nodes[node.X - 1, node.Y - 1];
+            yield return GetNode(node.X - 1, node.Y - 1);
         }
         if (isNotOnBotBorder && isNotOnLeftBorder)
         {
-            yield return _nodes[node.X - 1, node.Y + 1];
+            yield return GetNode(node.X - 1, node.Y + 1);
         }
         if (isNotOnTopBorder && isNotOnRightBorder)
         {
-            yield return _nodes[node.X + 1, node.Y - 1];
+            yield return GetNode(node.X + 1, node.Y - 1);
         }
         if (isNotOnBotBorder && isNotOnRightBorder)
         {
-            yield return _nodes[node.X + 1, node.Y + 1];
+            yield return GetNode(node.X + 1, node.Y + 1);
         }
     }
 
@@ -121,18 +126,17 @@ internal static class NodeAggregator
         }
     }
 
-    public static IEnumerable<Node> Segment(Node? node, int range)
+    public static IEnumerable<Node> Segment(Node? node, int range, NeighbourType neighbourType = NeighbourType.Diagonal)
     {
         List<Node> nodes = new List<Node>() { node };
 
         for (int i = 0; i < range; i++)
         {
-            var buffer = new List<Node>();
-            foreach (var node_ in nodes)
+            var buffer = new HashSet<Node>();
+            foreach (var neighbour in 
+                     nodes.SelectMany(node_ => NeighbouringNodes(node_, neighbourType).Except(nodes)))
             {
-                buffer.AddRange(NeighbouringNodes(node_, NeighbourType.Diagonal)
-                    .Except(nodes)
-                    .Except(buffer));
+                buffer.Add(neighbour);
             }
             nodes.AddRange(buffer);
         }
@@ -189,21 +193,13 @@ internal static class NodeAggregator
 
     public static bool CanStepOnNode(Node x)
     {
-        if (x.Surface == Surface.Tree)
+        switch (x.Surface)
         {
-            return false;
+            case Surface.Tree:
+            case Surface.Water:
+                return false;
+            default:
+                return x.Unit == null;
         }
-
-        if (x.Surface == Surface.Water)
-        {
-            return false;
-        }
-
-        if (x.Unit != null)
-        {
-            return false;
-        }
-
-        return true;
     }
 }
